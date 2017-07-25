@@ -1,4 +1,12 @@
 /.gradle
-.classpath
-.project
-.settings/
+
+*/.classpath
+*/.project
+*/.settings/
+*/build/
+*/.factorypath
+
+*/.apt_generated/
+*/bin/
+
+*/.gitignore

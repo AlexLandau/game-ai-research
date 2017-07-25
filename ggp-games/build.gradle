@@ -1,0 +1,12 @@
+apply plugin: 'java'
+apply plugin: 'eclipse'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile project(':shared')
+
+    compile 'net.alloyggp:alloy-ggp-base:0.0.9'
+}
