@@ -6,11 +6,6 @@ public interface StrategyParameterDescription<T> {
     @Value.Parameter
     public String getName();
 
-    public static enum Type {
-        INTEGER,
-        DOUBLE,
-    }
-
     public static ImmutableIntStrategyParameterDescription.Builder forInt(String name) {
         return ImmutableIntStrategyParameterDescription.builder().name(name);
     }

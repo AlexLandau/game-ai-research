@@ -11,6 +11,6 @@ dependencies {
     compile project(':ggp-games')
 
     compile project(':java-strategies')
-    
+
     compile 'org.apache.commons:commons-math3:3.6.1'
 }

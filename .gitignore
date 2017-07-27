@@ -1,5 +1,7 @@
 /.gradle
 
+/results/
+
 */.classpath
 */.project
 */.settings/

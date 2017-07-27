@@ -8,5 +8,5 @@ repositories {
 dependencies {
     compile project(':shared')
 
-    compile 'net.alloyggp:alloy-ggp-base:0.0.9'
+    compile 'net.alloyggp:alloy-ggp-base:0.0.10'
 }

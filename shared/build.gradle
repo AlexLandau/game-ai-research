@@ -8,7 +8,8 @@ repositories {
 dependencies {
     compileOnly 'org.immutables:value:2.5.5'
 
-    // TODO: Fix up alloy-ggp-base to be compatible with a later guava version,
-    // then move this to the latest
-    compile 'com.google.guava:guava:14.0.1'
+    compile 'com.google.guava:guava:22.0'
+    compile 'com.fasterxml.jackson.core:jackson-databind:2.8.9'
+    compile 'com.fasterxml.jackson.datatype:jackson-datatype-guava:2.8.9'
+
 }

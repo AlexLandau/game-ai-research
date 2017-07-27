@@ -1,13 +1,14 @@
 package net.alloyggp.research.applications;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.stream.Collectors;
 
 import org.apache.commons.math3.random.MersenneTwister;
 import org.apache.commons.math3.random.RandomAdaptor;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 
 import net.alloyggp.research.GameState;
@@ -25,11 +26,11 @@ public class MatchRunner {
         this.matchSpec = matchSpec;
     }
 
-    public static void run(MatchSpec matchSpec) {
+    public static void run(MatchSpec matchSpec) throws IOException {
         MatchRunner runner = new MatchRunner(matchSpec);
         MatchResult result = runner.run();
-        // TODO: Do something with the result
-        System.out.println("Result: " + result);
+
+        MatchResults.saveResult(result);
     }
 
     private MatchResult run() {
@@ -38,7 +39,7 @@ public class MatchRunner {
         Game game = getGame();
         List<Player> players = getPlayers(random);
 
-        List<List<String>> moveHistory = Lists.newArrayList();
+        List<ImmutableList<String>> moveHistory = Lists.newArrayList();
 
         long startTime = System.currentTimeMillis();
         GameState state = game.getInitialState();
@@ -50,7 +51,7 @@ public class MatchRunner {
             for (Player player : players) {
                 moves.add(player.getMove());
             }
-            moveHistory.add(moves.stream().map(Move::getName).collect(Collectors.toList()));
+            moveHistory.add(moves.stream().map(Move::getName).collect(ImmutableList.toImmutableList()));
             state = state.getNextState(moves);
             for (Player player : players) {
                 player.advanceGameState(moves, state);
@@ -61,7 +62,7 @@ public class MatchRunner {
 
         return ImmutableMatchResult.builder()
             .spec(matchSpec)
-            .seed(seed)
+            .addSeed(seed)
             .addAllMoveHistory(moveHistory)
             .addAllOutcomes(outcome)
             .millisecondsToRun(millisecondsToRun)

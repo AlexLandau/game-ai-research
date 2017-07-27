@@ -1,6 +1,9 @@
 package net.alloyggp.research.applications;
 
+import java.io.IOException;
+
 import net.alloyggp.research.ImmutableMatchSpec;
+import net.alloyggp.research.MatchResult;
 import net.alloyggp.research.MatchSpec;
 import net.alloyggp.research.StrategyProvider;
 import net.alloyggp.research.strategy.NPlyLookaheadStrategyProvider;
@@ -10,10 +13,15 @@ import net.alloyggp.research.strategy.parameter.StrategyParameters;
 // This is essentially used as a simple test of the framework.
 public class SingleMatchRunner {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         MatchSpec spec = createMatchSpec();
         MatchRunner.run(spec);
+        MatchRunner.run(spec);
         // TODO: Read the records created this way.
+
+        for (MatchResult result : MatchResults.loadAllResults(spec.getExperimentName())) {
+            System.out.println(result);
+        }
     }
 
     private static MatchSpec createMatchSpec() {
