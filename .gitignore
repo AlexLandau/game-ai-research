@@ -2,13 +2,13 @@
 
 /results/
 
-*/.classpath
-*/.project
-*/.settings/
-*/build/
-*/.factorypath
+/*/.classpath
+/*/.project
+/*/.settings/
+/*/build/
+/*/.factorypath
 
-*/.apt_generated/
-*/bin/
+/*/.apt_generated/
+/*/bin/
 
-*/.gitignore
+/*/.gitignore

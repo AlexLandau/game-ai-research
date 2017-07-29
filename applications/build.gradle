@@ -8,9 +8,9 @@ repositories {
 dependencies {
     compile project(':shared')
 
-    compile project(':ggp-games')
+    compile project(':games-ggp')
 
-    compile project(':java-strategies')
+    compile project(':strategies-java')
 
     compile 'org.apache.commons:commons-math3:3.6.1'
 }

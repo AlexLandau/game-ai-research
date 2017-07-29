@@ -1,4 +1,4 @@
 include 'applications'
-include 'ggp-games'
-include 'java-strategies'
+include 'games-ggp'
+include 'strategies-java'
 include 'shared'
