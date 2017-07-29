@@ -2,6 +2,7 @@ package net.alloyggp.research;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -16,7 +17,14 @@ public interface TurnTakingGameState {
 
     default List<TurnTakingGameState> getPossibleNextStates() {
         return getPossibleMoves().stream()
-                .map(move -> this.getNextState(move))
+                .map(this::getNextState)
+                .collect(Collectors.toList());
+    }
+
+    default List<Double> getOutcomes(int numPlayers) {
+        return IntStream.range(0, numPlayers)
+                .mapToDouble(this::getOutcomeForRole)
+                .boxed()
                 .collect(Collectors.toList());
     }
 
@@ -84,4 +92,6 @@ public interface TurnTakingGameState {
             }
         };
     }
+
+
 }

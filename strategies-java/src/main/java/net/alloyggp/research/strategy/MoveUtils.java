@@ -13,29 +13,43 @@ public class MoveUtils {
         // Not instantiable
     }
 
-    public static Move pickMoveWithHighestScore(TurnTakingGameState currentState,
-            Function<TurnTakingGameState, Double> scoreFunction, Random random) {
-        List<Move> movesWithHighestScore = new ArrayList<>();
+    public static <T> T pickThingWithHighestScore(Iterable<T> possibilities,
+                                                  Function<T, Double> scoreFunction,
+                                                  Random random) {
+        List<T> thingsWithHighestScore = new ArrayList<>();
         double highestScore = Double.NEGATIVE_INFINITY;
 
-        for (Move move : currentState.getPossibleMoves()) {
-            double score = scoreFunction.apply(currentState.getNextState(move));
+        for (T thing : possibilities) {
+            double score = scoreFunction.apply(thing);
             if (!(score > Double.NEGATIVE_INFINITY)) {
                 throw new IllegalStateException("Score was unexpectedly " + score);
             }
 
             if (score > highestScore) {
-                movesWithHighestScore.clear();
-                movesWithHighestScore.add(move);
+                thingsWithHighestScore.clear();
+                thingsWithHighestScore.add(thing);
                 highestScore = score;
             } else if (score == highestScore) {
-                movesWithHighestScore.add(move);
+                thingsWithHighestScore.add(thing);
             }
         }
-        if (movesWithHighestScore.size() == 1) {
-            return movesWithHighestScore.get(0);
+        if (thingsWithHighestScore.size() == 1) {
+            return thingsWithHighestScore.get(0);
         }
-        int indexToReturn = random.nextInt(movesWithHighestScore.size());
-        return movesWithHighestScore.get(indexToReturn);
+        return pickAtRandom(thingsWithHighestScore, random);
+    }
+
+    public static <T> T pickAtRandom(List<T> list, Random random) {
+        if (list.isEmpty()) {
+            throw new IllegalArgumentException("Can only pick at random from a non-empty list");
+        }
+        int indexToReturn = random.nextInt(list.size());
+        return list.get(indexToReturn);
+    }
+
+    public static Move pickMoveWithHighestScore(TurnTakingGameState currentState,
+            Function<TurnTakingGameState, Double> scoreFunction, Random random) {
+        return pickThingWithHighestScore(currentState.getPossibleMoves(), move ->
+            scoreFunction.apply(currentState.getNextState(move)), random);
     }
 }

@@ -9,6 +9,7 @@ import com.google.common.collect.Maps;
 
 import net.alloyggp.research.Strategy;
 import net.alloyggp.research.StrategyProvider;
+import net.alloyggp.research.strategy.MemorylessUCTStrategyProvider;
 import net.alloyggp.research.strategy.NPlyLookaheadStrategyProvider;
 import net.alloyggp.research.strategy.RandomStrategyProvider;
 import net.alloyggp.research.strategy.parameter.StrategyParameterDescription;
@@ -20,11 +21,12 @@ public class StrategyRegistry {
     }
 
     // TODO: Cache the result of this
-    public static Map<String, StrategyProvider> collectStrategyProviders() {
+    private static Map<String, StrategyProvider> collectStrategyProviders() {
         Map<String, StrategyProvider> strategyProviders = Maps.newHashMap();
 
         add(strategyProviders, new RandomStrategyProvider());
         add(strategyProviders, new NPlyLookaheadStrategyProvider());
+        add(strategyProviders, new MemorylessUCTStrategyProvider());
 
         return strategyProviders;
     }
@@ -114,5 +116,16 @@ public class StrategyRegistry {
             map.put(parameter.getName(), parameter);
         }
         return map;
+    }
+
+    public static Map<String, String> getParametersFromId(String strategyId) {
+        String[] components = strategyId.split(":");
+
+        Map<String, String> results = Maps.newHashMap();
+        for (int i = 1; i < components.length; i++) {
+            String[] parts = components[i].split("=");
+            results.put(parts[0], parts[1]);
+        }
+        return results;
     }
 }

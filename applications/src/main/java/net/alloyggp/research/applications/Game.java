@@ -11,7 +11,9 @@ import net.alloyggp.research.game.GGPBaseGame;
  * - Number of players, if we end up supporting numbers other than 2
  *
  */
+// TODO: Unit test to ensure no two have same display name
 public enum Game {
+    BLOCKER("Blocker", GGPBaseGame.fromProver("blocker"), Simultaneous.YES),
     TIC_TAC_TOE("Tic-tac-toe", GGPBaseGame.fromProver("ticTacToe"), Simultaneous.NO),
     ;
     private final String displayName;

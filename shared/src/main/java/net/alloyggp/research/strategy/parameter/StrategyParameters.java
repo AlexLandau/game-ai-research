@@ -36,13 +36,24 @@ public class StrategyParameters {
 
         // No value found; return the default if there is one
         if (parameter instanceof StrategyParameterDescriptionWithDefault) {
-            Optional<T> possibleDefault = ((StrategyParameterDescriptionWithDefault<T>) parameter).getDefault();
+            Optional<T> possibleDefault = ((StrategyParameterDescriptionWithDefault<T>) parameter).getDefaultValue();
             if (possibleDefault.isPresent()) {
                 return possibleDefault.get();
             }
         }
         throw new IllegalStateException("Trying to get a parameter with name " + parameter.getName() +
                 ", but no such parameter was provided.");
+    }
+
+    public <T> StrategyParameters withParsed(StrategyParameterDescription<T> modifiedParameter, String valueString) {
+        Builder builder = new Builder();
+        for (StrategyParameterDescription<?> param : parameterDescriptions) {
+            if (!param.getName().equals(modifiedParameter.getName())) {
+                builder.putUnsafe(param, parameters.get(param.getName()));
+            }
+        }
+        builder.parseAndPut(modifiedParameter, valueString);
+        return builder.build();
     }
 
     public static class Builder {
@@ -56,6 +67,17 @@ public class StrategyParameters {
             }
 
             parameter.validate(value);
+            parameters.put(parameter.getName(), value);
+            parameterDescriptions.add(parameter);
+            return this;
+        }
+
+        private Builder putUnsafe(StrategyParameterDescription<?> parameter, Object value) {
+            if (parameters.containsKey(parameter.getName())) {
+                throw new IllegalArgumentException("Tried to add a parameter with the same name (" +
+                        parameter.getName() + ") multiple times");
+            }
+
             parameters.put(parameter.getName(), value);
             parameterDescriptions.add(parameter);
             return this;
