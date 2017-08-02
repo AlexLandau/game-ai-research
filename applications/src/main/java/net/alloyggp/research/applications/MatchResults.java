@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.guava.GuavaModule;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 
 import net.alloyggp.research.MatchResult;
@@ -24,6 +25,9 @@ public class MatchResults {
         File resultsDirectory = Files.getExperimentResultsDirectory(experimentName);
         // ...
         File resultsFile = new File(resultsDirectory, "results");
+        if (!resultsFile.exists()) {
+            return ImmutableList.of();
+        }
         ObjectMapper objectMapper = createObjectMapper();
 
         List<MatchResult> results = Lists.newArrayList();

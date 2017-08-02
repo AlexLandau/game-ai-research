@@ -32,6 +32,10 @@ public enum Game {
         NO,
     }
 
+    public String getDisplayName() {
+        return displayName;
+    }
+
     public GameState getInitialState() {
         return treeProvider.getInitialState();
     }

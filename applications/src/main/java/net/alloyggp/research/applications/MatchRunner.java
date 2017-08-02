@@ -58,14 +58,14 @@ public class MatchRunner {
             }
         }
         List<Double> outcome = state.getOutcomes();
-        long millisecondsToRun = System.currentTimeMillis() - startTime;
+        long millisecondsElapsed = System.currentTimeMillis() - startTime;
 
         return ImmutableMatchResult.builder()
             .spec(matchSpec)
             .addSeed(seed)
             .addAllMoveHistory(moveHistory)
             .addAllOutcomes(outcome)
-            .millisecondsToRun(millisecondsToRun)
+            .millisecondsElapsed(millisecondsElapsed)
             .build();
     }
 

@@ -7,11 +7,11 @@ import java.util.Random;
 public interface Strategy {
     Player getPlayer(int roleIndex, Random random);
 
-    public static Strategy wrap(MemorylessTurnTakingStrategy nPlyLookaheadStrategy) {
+    public static Strategy wrap(MemorylessTurnTakingStrategy memorylessTurnTakingStrategy) {
         return new Strategy() {
             @Override
             public Player getPlayer(int roleIndex, Random random) {
-                MemorylessTurnTakingPlayer delegate = nPlyLookaheadStrategy.getPlayer(roleIndex, random);
+                MemorylessTurnTakingPlayer delegate = memorylessTurnTakingStrategy.getPlayer(roleIndex, random);
                 return new Player() {
                     private GameState currentGameState;
                     @Override

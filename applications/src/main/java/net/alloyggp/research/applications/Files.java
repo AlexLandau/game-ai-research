@@ -16,6 +16,13 @@ public class Files {
         return experimentResultsDir;
     }
 
+    public static File getReportsDirectory() {
+        File gitRoot = findGitRoot();
+        File reportsDir = new File(gitRoot, "reports");
+        ensureDirectoryExists(reportsDir);
+        return reportsDir;
+    }
+
     private static File findGitRoot() {
         File curDir = new File(".");
         while (curDir.exists()) {
@@ -40,5 +47,6 @@ public class Files {
             throw new RuntimeException("Can't make the '" + name + "' directory in " + parent + " because a non-directory file already exists there for some reason.");
         }
     }
+
 
 }

@@ -1,24 +1,35 @@
 package net.alloyggp.research.strategy
 
-import net.alloyggp.research.*
+import net.alloyggp.research.MemorylessTurnTakingPlayer
+import net.alloyggp.research.MemorylessTurnTakingStrategy
+import net.alloyggp.research.Move
+import net.alloyggp.research.Strategy
+import net.alloyggp.research.StrategyProvider
+import net.alloyggp.research.TurnTakingGameState
 import net.alloyggp.research.strategy.parameter.StrategyParameterDescription
 import net.alloyggp.research.strategy.parameter.StrategyParameters
-import java.util.*
+import java.util.ArrayList
+import java.util.LinkedHashMap
+import java.util.Random
 
 /**
  * An implementation of the well-known UCT algorithm.
  *
  * This version runs a fixed number of iterations of the algorithm ("rollouts") per move.
- * It discards its game tree after each move and does not use transposition tables.
+ * It discards its game tree after each move and does not use transposition tables. It
+ * adds every node visited in a rollout to its game tree.
  *
- * Relevant publication: Kocsis and Szepesvári, "Bandit based Monte Carlo planning"
- * (TODO: Get actual citation)
- *
- * Accessed from http://ggp.stanford.edu/readings/uct.pdf
+ * Original publication:
+ * Kocsis, Levente, and Csaba Szepesvári. "Bandit based monte-carlo planning." ECML. Vol. 6. 2006.
+ * Available from:
+ * http://ggp.stanford.edu/readings/uct.pdf
+ * https://pdfs.semanticscholar.org/a441/488e8fe40370b7f5f99eb5a1659d93fb7091.pdf
  */
 class MemorylessUCTStrategyProvider: StrategyProvider {
     companion object {
+        @JvmStatic
         val C_P: StrategyParameterDescription<Double> = StrategyParameterDescription.forDouble("c_p").min(0.0).defaultValue(Math.sqrt(2.0)).build()
+        @JvmStatic
         val ITERATION_COUNT: StrategyParameterDescription<Int> = StrategyParameterDescription.forInt("iterationCount").min(0).build()
     }
 

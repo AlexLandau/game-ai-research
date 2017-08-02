@@ -16,5 +16,5 @@ public interface MatchResult {
     ImmutableList<Integer> getSeed();
     ImmutableList<Double> getOutcomes();
     ImmutableList<ImmutableList<String>> getMoveHistory();
-    long getMillisecondsToRun();
+    long getMillisecondsElapsed();
 }
