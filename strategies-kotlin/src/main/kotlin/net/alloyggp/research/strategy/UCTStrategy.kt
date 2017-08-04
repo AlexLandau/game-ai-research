@@ -108,7 +108,7 @@ class MemorylessUCTPlayer(val iterationsPerTurn: Int, val c_p: Double, val roleI
             return MoveUtils.pickAtRandom(untriedMoves, random)
         }
 
-        val timesAnythingChosen = curNode.childStats.values.map(SumAndCountArray::getCount).sum()
+        val timesAnythingChosen = curNode.childStats.values.map(SumAndCountArray::getCount).sum().toDouble()
 
         return MoveUtils.pickThingWithHighestScore(curNode.childStats.keys, { move ->
             val stats = curNode.childStats[move]!!
@@ -116,7 +116,7 @@ class MemorylessUCTPlayer(val iterationsPerTurn: Int, val c_p: Double, val roleI
             // A typical UCT formula is vi + c*sqrt(log np / ni). vi here is the average reward for that state. c is an arbitrary constant. np is the total number of times the state's parent was picked. ni is the number of times this particular state was picked.
             val averageScore = stats.getAverage(curNode.activeRole)
             val timesThisChosen = stats.getCount().toDouble()
-            averageScore + c_p * Math.sqrt(Math.log(timesThisChosen) / timesAnythingChosen)
+            averageScore + c_p * Math.sqrt(Math.log(timesAnythingChosen) / timesThisChosen)
         }, random)
     }
 }
@@ -181,5 +181,9 @@ class SumAndCountArray(private val sums: MutableList<Double>, private var count:
             sums[index] += value
         }
         count += 1L
+    }
+
+    override fun toString(): String {
+        return "$sums/$count"
     }
 }

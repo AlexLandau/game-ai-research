@@ -17,7 +17,7 @@ import net.alloyggp.research.GameTreeProvider;
 import net.alloyggp.research.Move;
 
 public final class GGPBaseGame implements GameTreeProvider {
-    public class GGPBaseMove implements Move {
+    public class GGPBaseMove extends Move {
         public final org.ggp.base.util.statemachine.Move move;
 
         public GGPBaseMove(org.ggp.base.util.statemachine.Move move) {
@@ -27,6 +27,43 @@ public final class GGPBaseGame implements GameTreeProvider {
         @Override
         public String getName() {
             return move.toString();
+        }
+
+        @Override
+        public String toString() {
+            return move.toString();
+        }
+
+        @Override
+        public int hashCode() {
+            final int prime = 31;
+            int result = 1;
+            result = prime * result + getOuterType().hashCode();
+            result = prime * result + ((move == null) ? 0 : move.hashCode());
+            return result;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj)
+                return true;
+            if (obj == null)
+                return false;
+            if (getClass() != obj.getClass())
+                return false;
+            GGPBaseMove other = (GGPBaseMove) obj;
+            if (!getOuterType().equals(other.getOuterType()))
+                return false;
+            if (move == null) {
+                if (other.move != null)
+                    return false;
+            } else if (!move.equals(other.move))
+                return false;
+            return true;
+        }
+
+        private GGPBaseGame getOuterType() {
+            return GGPBaseGame.this;
         }
     }
 
