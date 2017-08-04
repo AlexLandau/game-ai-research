@@ -4,18 +4,22 @@ import java.awt.Color;
 import java.text.NumberFormat;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.SortedSet;
 
 import javax.annotation.Nullable;
 
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 
 import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.HashMultiset;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.LinkedHashMultiset;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multiset;
+import com.google.common.collect.Sets;
 
 import net.alloyggp.research.Experiment;
 import net.alloyggp.research.ImmutableMatchSpec;
@@ -117,7 +121,7 @@ public class ParameterChartExperiment<T> implements Experiment {
 
     private String writeHtml(Map<String, ListMultimap<List<String>, MatchResult>> groupedResultsByGameId) {
         StringBuilder sb = new StringBuilder();
-        sb.append("<html><head><title>UCT Charts</title><style>td {width:36px;height:36px;text-align:center;}</style></head><body>\n");
+        sb.append("<html><head><title>UCT Charts</title><style>.outcomes-table td {width:36px;height:36px;text-align:center;}</style></head><body>\n");
 
         sb.append("<p>Player 1 is blue, player 2 is red.</p>\n");
         sb.append("<p>Hover over a cell to see player 1's average score on a scale from 0 to 1, followed by the average seconds taken per match.</p>\n");
@@ -126,6 +130,7 @@ public class ParameterChartExperiment<T> implements Experiment {
             sb.append("<h1>" + Game.valueOf(gameId).getDisplayName() + "</h1>\n");
             writeSampleSizeAndTimingNote(sb, groupedResultsByGameId.get(gameId));
             writeTableForResults(sb, groupedResultsByGameId.get(gameId));
+            writeTablesForMoveChoices(sb, groupedResultsByGameId.get(gameId));
         }
 
         sb.append("</body></html>\n");
@@ -177,7 +182,7 @@ public class ParameterChartExperiment<T> implements Experiment {
     //TODO: Adjust the cell sizes and label font sizes so the cells are perfect squares, and/or convert to <svg>
     private void writeTableForResults(StringBuilder sb, ListMultimap<List<String>, MatchResult> listMultimap) {
 
-        sb.append("<table style='border-collapse: collapse'>\n");
+        sb.append("<table class='outcomes-table' style='border-collapse: collapse'>\n");
 
         // Remember to also change the description at the top of the report
         // if you change the color scheme.
@@ -361,5 +366,81 @@ public class ParameterChartExperiment<T> implements Experiment {
             results.get(entry.getSpec().getGameId()).put(parameterValues, entry);
         }
         return results;
+    }
+
+    private void writeTablesForMoveChoices(StringBuilder sb,
+            ListMultimap<List<String>, MatchResult> results) {
+        writeMoveChoiceTableForPlayer(0, sb, results);
+        writeMoveChoiceTableForPlayer(1, sb, results);
+    }
+
+    private void writeMoveChoiceTableForPlayer(int roleIndex, StringBuilder sb,
+            ListMultimap<List<String>, MatchResult> results) {
+        NumberFormat numberFormat = getThreeDigitDecimalFormat();
+        sb.append("<h3>First move choice for player "+(roleIndex + 1)+"</h3>\n");
+
+        // Rows are possible moves, columns are parameter settings, cells are probabilities
+        List<String> allFirstMovesForPlayer = getAllFirstMovesForPlayer(roleIndex, results);
+        Map<String, Multiset<String>> countsByMoveByParamValue = getCountsByMoveByParamValue(roleIndex, results);
+
+        sb.append("<table>\n");
+
+        // TODO: Write the first row, where we list our parameter settings
+        sb.append(" <tr><td>Move</td>");
+        for (String paramValue : unparsedParameterValues) {
+            sb.append("<td>");
+            sb.append(paramValue);
+            sb.append("</td>");
+        }
+        sb.append("</tr>\n");
+
+        for (String firstMove : allFirstMovesForPlayer) {
+            sb.append(" <tr><td>");
+            sb.append(firstMove);
+            sb.append("</td>\n");
+            for (String paramValue : unparsedParameterValues) {
+                sb.append("  <td>");
+                double percentage = getFirstMovePercentage(firstMove, paramValue, countsByMoveByParamValue);
+                sb.append(numberFormat.format(percentage));
+                sb.append("</td>\n");
+            }
+            sb.append("</tr>\n");
+        }
+
+        sb.append("</table>\n");
+    }
+
+    private double getFirstMovePercentage(String firstMove, String paramValue,
+            Map<String, Multiset<String>> countsByMoveByParamValue) {
+        Multiset<String> countsByMove = countsByMoveByParamValue.get(paramValue);
+        if (countsByMove.size() == 0) {
+            return 0.0;
+        }
+        return countsByMove.count(firstMove) / (double) countsByMove.size();
+    }
+
+    private Map<String, Multiset<String>> getCountsByMoveByParamValue(int roleIndex,
+            ListMultimap<List<String>, MatchResult> results) {
+        Map<String, Multiset<String>> countsByMoveByParamValue = Maps.newHashMap();
+        for (String paramValue : unparsedParameterValues) {
+            countsByMoveByParamValue.put(paramValue, HashMultiset.create());
+        }
+        for (Entry<List<String>, MatchResult> entry : results.entries()) {
+            String paramValue = entry.getKey().get(roleIndex);
+            Multiset<String> countsByMove = countsByMoveByParamValue.get(paramValue);
+            String firstMove = entry.getValue().getMoveHistory().get(0).get(roleIndex);
+            countsByMove.add(firstMove);
+        }
+        return countsByMoveByParamValue;
+    }
+
+    private List<String> getAllFirstMovesForPlayer(int roleIndex,
+            ListMultimap<List<String>, MatchResult> results) {
+        SortedSet<String> moves = Sets.newTreeSet();
+        for (MatchResult result : results.values()) {
+            String firstMove = result.getMoveHistory().get(0).get(roleIndex);
+            moves.add(firstMove);
+        }
+        return ImmutableList.copyOf(moves);
     }
 }
