@@ -5,6 +5,7 @@ import java.text.NumberFormat;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.SortedSet;
 
 import javax.annotation.Nullable;
@@ -14,6 +15,7 @@ import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.LinkedHashMultiset;
 import com.google.common.collect.ListMultimap;
@@ -357,12 +359,19 @@ public class ParameterChartExperiment<T> implements Experiment {
 
     private Map<String, ListMultimap<List<String>, MatchResult>> groupResults(List<MatchResult> abfResults) {
         Map<String, ListMultimap<List<String>, MatchResult>> results = Maps.newHashMap();
+        Set<String> relevantParameters = ImmutableSet.copyOf(unparsedParameterValues);
 
         for (MatchResult entry : abfResults) {
             if (!results.containsKey(entry.getSpec().getGameId())) {
                 results.put(entry.getSpec().getGameId(), ArrayListMultimap.create());
             }
             List<String> parameterValues = getUnparsedParameterValues(entry);
+            if (!parameterValues.stream().allMatch(relevantParameters::contains)) {
+                // This match involves some parameter value we used to care about but no longer
+                // do; exclude it from the beginning here to avoid it showing up in some parts
+                // of the report but not others
+                continue;
+            }
             results.get(entry.getSpec().getGameId()).put(parameterValues, entry);
         }
         return results;
