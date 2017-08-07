@@ -11,8 +11,8 @@ import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.guava.GuavaModule;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
 
 import net.alloyggp.research.MatchResult;
 
@@ -30,7 +30,6 @@ public class MatchResults {
         }
         ObjectMapper objectMapper = createObjectMapper();
 
-        List<MatchResult> results = Lists.newArrayList();
         try (BufferedReader reader = new BufferedReader(new FileReader(resultsFile))) {
             return reader.lines()
                 .map(line -> {
@@ -41,10 +40,7 @@ public class MatchResults {
                     }
                 })
                 .collect(Collectors.toList());
-        } catch (RuntimeException e) {
-            e.printStackTrace();
         }
-        return results;
     }
 
     public static void saveResult(MatchResult result) throws IOException {
@@ -62,6 +58,7 @@ public class MatchResults {
 
     private static ObjectMapper createObjectMapper() {
         ObjectMapper objectMapper = new ObjectMapper()
+                .registerModule(new Jdk8Module())
                 .registerModule(new GuavaModule());
         return objectMapper;
     }

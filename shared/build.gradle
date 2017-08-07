@@ -11,5 +11,6 @@ dependencies {
     compile 'com.google.guava:guava:22.0'
     compile 'com.fasterxml.jackson.core:jackson-databind:2.8.9'
     compile 'com.fasterxml.jackson.datatype:jackson-datatype-guava:2.8.9'
+    compile 'com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.8.9'
 
 }

@@ -1,7 +1,8 @@
 package net.alloyggp.research;
 
-import java.util.Arrays;
 import java.util.List;
+
+import com.google.common.collect.ImmutableList;
 
 // TODO: Consider parameterizing in terms of Move?
 // TODO: Add something in the framework to allow transposition tables
@@ -12,7 +13,7 @@ public interface GameState {
     boolean isTerminal();
     double getOutcomeForRole(int role);
 
-    default List<Double> getOutcomes() {
-        return Arrays.asList(getOutcomeForRole(0), getOutcomeForRole(1));
+    default ImmutableList<Double> getOutcomes() {
+        return ImmutableList.of(getOutcomeForRole(0), getOutcomeForRole(1));
     }
 }

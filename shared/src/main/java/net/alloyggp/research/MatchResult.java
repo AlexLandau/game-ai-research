@@ -1,5 +1,7 @@
 package net.alloyggp.research;
 
+import java.util.Optional;
+
 import org.immutables.value.Value;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -14,7 +16,9 @@ public interface MatchResult {
     MatchSpec getSpec();
     // TODO: Replace this with ImmutableIntArray when jackson-datatype-guava supports it
     ImmutableList<Integer> getSeed();
-    ImmutableList<Double> getOutcomes();
+    boolean hadError();
+    Optional<String> getErrorString();
+    Optional<ImmutableList<Double>> getOutcomes();
     ImmutableList<ImmutableList<String>> getMoveHistory();
     long getMillisecondsElapsed();
 }

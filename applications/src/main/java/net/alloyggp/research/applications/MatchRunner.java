@@ -8,6 +8,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import org.apache.commons.math3.random.MersenneTwister;
 import org.apache.commons.math3.random.RandomAdaptor;
 
+import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 
@@ -41,32 +42,53 @@ public class MatchRunner {
 
         List<ImmutableList<String>> moveHistory = Lists.newArrayList();
 
-        long startTime = System.currentTimeMillis();
-        GameState state = game.getInitialState();
-        for (Player player : players) {
-            player.initializeGameState(state);
-        }
-        while (!state.isTerminal()) {
-            List<Move> moves = Lists.newArrayList();
+        long startTime = -1;
+        try {
+            GameState state = game.getInitialState();
+            startTime = System.currentTimeMillis();
             for (Player player : players) {
-                moves.add(player.getMove());
+                player.initializeGameState(state);
             }
-            moveHistory.add(moves.stream().map(Move::getName).collect(ImmutableList.toImmutableList()));
-            state = state.getNextState(moves);
-            for (Player player : players) {
-                player.advanceGameState(moves, state);
+            while (!state.isTerminal()) {
+                List<Move> moves = Lists.newArrayList();
+                for (Player player : players) {
+                    moves.add(player.getMove());
+                }
+                moveHistory.add(moves.stream().map(Move::getName).collect(ImmutableList.toImmutableList()));
+                state = state.getNextState(moves);
+                for (Player player : players) {
+                    player.advanceGameState(moves, state);
+                }
             }
-        }
-        List<Double> outcome = state.getOutcomes();
-        long millisecondsElapsed = System.currentTimeMillis() - startTime;
+            ImmutableList<Double> outcome = state.getOutcomes();
+            long millisecondsElapsed = System.currentTimeMillis() - startTime;
 
-        return ImmutableMatchResult.builder()
-            .spec(matchSpec)
-            .addSeed(seed)
-            .addAllMoveHistory(moveHistory)
-            .addAllOutcomes(outcome)
-            .millisecondsElapsed(millisecondsElapsed)
-            .build();
+            return ImmutableMatchResult.builder()
+                .spec(matchSpec)
+                .addSeed(seed)
+                .addAllMoveHistory(moveHistory)
+                .hadError(false)
+                .outcomes(outcome)
+                .millisecondsElapsed(millisecondsElapsed)
+                .build();
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+            String errorString = Throwables.getStackTraceAsString(e);
+
+            long millisecondsElapsed = 0;
+            if (startTime != -1) {
+                millisecondsElapsed = System.currentTimeMillis() - startTime;
+            }
+
+            return ImmutableMatchResult.builder()
+                    .spec(matchSpec)
+                    .addSeed(seed)
+                    .addAllMoveHistory(moveHistory)
+                    .hadError(true)
+                    .errorString(errorString)
+                    .millisecondsElapsed(millisecondsElapsed)
+                    .build();
+        }
     }
 
     private int[] getSeed() {

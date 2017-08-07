@@ -12,6 +12,7 @@ import org.ggp.base.util.statemachine.exceptions.GoalDefinitionException;
 import org.ggp.base.util.statemachine.exceptions.MoveDefinitionException;
 import org.ggp.base.util.statemachine.exceptions.TransitionDefinitionException;
 import org.ggp.base.util.statemachine.implementation.prover.ProverStateMachine;
+import org.ggp.base.util.statemachine.sancho.SanchoStateMachineFactory;
 
 import net.alloyggp.research.GameState;
 import net.alloyggp.research.GameTreeProvider;
@@ -132,13 +133,34 @@ public final class GGPBaseGame implements GameTreeProvider {
         this.stateMachineSupplier = stateMachineSupplier;
     }
 
-    public static GameTreeProvider fromProver(String gameKey) {
+    public static GameTreeProvider usingProver(String gameKey) {
         Supplier<StateMachine> stateMachineSupplier = () -> {
             List<Gdl> rules = GameRepository.getDefaultRepository().getGame(gameKey).getRules();
 
             ProverStateMachine stateMachine = new ProverStateMachine();
             stateMachine.initialize(rules);
             return stateMachine;
+        };
+
+        return new GGPBaseGame(gameKey, stateMachineSupplier);
+    }
+
+    private static final ThreadLocal<StateMachine> SANCHO_ENGINE_CACHE = new ThreadLocal<StateMachine>();
+    private static final ThreadLocal<String> SANCHO_ENGINE_CACHE_KEY = new ThreadLocal<String>();
+
+    public static GameTreeProvider usingSanchoEngine(String gameKey) {
+        Supplier<StateMachine> stateMachineSupplier = () -> {
+            if (gameKey.equals(SANCHO_ENGINE_CACHE_KEY.get())) {
+                return SANCHO_ENGINE_CACHE.get();
+            } else {
+                SANCHO_ENGINE_CACHE.remove(); // just in case this reduces memory pressure
+                List<Gdl> rules = GameRepository.getDefaultRepository().getGame(gameKey).getRules();
+                // Note: This takes 5+ seconds.
+                StateMachine stateMachine = SanchoStateMachineFactory.INSTANCE.buildInitializedForRules(rules);
+                SANCHO_ENGINE_CACHE_KEY.set(gameKey);
+                SANCHO_ENGINE_CACHE.set(stateMachine);
+                return stateMachine;
+            }
         };
 
         return new GGPBaseGame(gameKey, stateMachineSupplier);

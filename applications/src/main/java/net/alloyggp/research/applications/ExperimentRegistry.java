@@ -22,9 +22,9 @@ public class ExperimentRegistry {
                         new MemorylessUCTStrategyProvider(),
                         StrategyParameters.empty(),
                         MemorylessUCTStrategyProvider.getITERATION_COUNT(),
-                        ImmutableList.of("10", "20", "40", "80", "160", "320", "640", "1280"),
+                        ImmutableList.of("10", "20", "40", "80", "160", "320", "640", "1280", "2560"),
                         ImmutableList.of(Game.TIC_TAC_TOE),
-                        25),
+                        30),
 
                 // Sample experiment 2
                 ParameterChartExperiment.create(
@@ -34,9 +34,9 @@ public class ExperimentRegistry {
                             .put(NPlyLookaheadStrategyProvider.DEFAULT_OUTCOME, 0.5)
                             .build(),
                         NPlyLookaheadStrategyProvider.PLIES_TO_LOOK_AHEAD,
-                        ImmutableList.of("1", "2", "3", "4", "5", "6", "7"),
+                        ImmutableList.of("1", "2", "3", "4", "5", "6", "7", "8", "9"),
                         ImmutableList.of(Game.TIC_TAC_TOE),
-                        5)
+                        30)
 
         );
     }

@@ -48,6 +48,7 @@ public class OngoingMatchRunner {
                     try {
                         MatchRunner.run(spec);
                     } catch (IOException e) {
+                        // TODO: We should really record errors, which might indicate invalid results
                         e.printStackTrace();
                     }
                 }

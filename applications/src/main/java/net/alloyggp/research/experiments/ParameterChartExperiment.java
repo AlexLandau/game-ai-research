@@ -335,7 +335,7 @@ public class ParameterChartExperiment<T> implements Experiment {
     private static double averageFirstPlayerScore(List<MatchResult> list) {
         double sum = 0.0;
         for (MatchResult result : list) {
-            sum += result.getOutcomes().get(0);
+            sum += result.getOutcomes().get().get(0);
         }
         int count = list.size();
         if (count == 0) {
