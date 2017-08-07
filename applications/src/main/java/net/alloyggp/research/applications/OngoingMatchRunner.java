@@ -87,6 +87,7 @@ public class OngoingMatchRunner {
 
         List<MatchResult> existingResults = MatchResults.loadAllResults(experiment.getName());
         Multiset<MatchSpec> existingSpecCounts = existingResults.stream()
+                .filter(result -> !result.hadError())
                 .map(result -> result.getSpec())
                 .collect(ImmutableMultiset.toImmutableMultiset());
 

@@ -13,6 +13,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.guava.GuavaModule;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ListMultimap;
+import com.google.common.collect.Multimaps;
 
 import net.alloyggp.research.MatchResult;
 
@@ -61,5 +63,9 @@ public class MatchResults {
                 .registerModule(new Jdk8Module())
                 .registerModule(new GuavaModule());
         return objectMapper;
+    }
+
+    public static ListMultimap<String, MatchResult> groupByGameId(List<MatchResult> results) {
+        return Multimaps.index(results, result -> result.getSpec().getGameId());
     }
 }

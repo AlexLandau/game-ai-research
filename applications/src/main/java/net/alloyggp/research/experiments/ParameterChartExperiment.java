@@ -33,6 +33,7 @@ import net.alloyggp.research.applications.StrategyRegistry;
 import net.alloyggp.research.strategy.parameter.StrategyParameterDescription;
 import net.alloyggp.research.strategy.parameter.StrategyParameters;
 
+//TODO: Add information about error counts
 public class ParameterChartExperiment<T> implements Experiment {
     private final String experimentName;
     private final StrategyProvider strategyProvider;
