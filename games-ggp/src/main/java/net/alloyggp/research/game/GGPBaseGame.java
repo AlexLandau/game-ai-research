@@ -1,6 +1,7 @@
 package net.alloyggp.research.game;
 
 import java.util.List;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import org.ggp.base.util.game.GameRepository;
@@ -68,9 +69,12 @@ public final class GGPBaseGame implements GameTreeProvider {
     }
 
     public final class GGPBaseGameState implements GameState {
+        private final StateMachine stateMachine;
         private final MachineState state;
 
-        public GGPBaseGameState(MachineState state) {
+        private GGPBaseGameState(StateMachine stateMachine,
+                MachineState state) {
+            this.stateMachine = stateMachine;
             this.state = state;
         }
 
@@ -97,7 +101,7 @@ public final class GGPBaseGame implements GameTreeProvider {
                 .collect(Collectors.toList());
             try {
                 MachineState nextState = stateMachine.getNextState(state, ggpBaseMoves);
-                return new GGPBaseGameState(nextState);
+                return new GGPBaseGameState(stateMachine, nextState);
             } catch (TransitionDefinitionException e) {
                 throw new RuntimeException("Error in GGP-Base game " + gameKey, e);
             }
@@ -120,24 +124,29 @@ public final class GGPBaseGame implements GameTreeProvider {
     }
 
     private final String gameKey;
-    private final StateMachine stateMachine;
+    private final Supplier<StateMachine> stateMachineSupplier;
 
-    private GGPBaseGame(String gameKey, StateMachine stateMachine) {
+    private GGPBaseGame(String gameKey,
+            Supplier<StateMachine> stateMachineSupplier) {
         this.gameKey = gameKey;
-        this.stateMachine = stateMachine;
+        this.stateMachineSupplier = stateMachineSupplier;
     }
 
     public static GameTreeProvider fromProver(String gameKey) {
-        List<Gdl> rules = GameRepository.getDefaultRepository().getGame(gameKey).getRules();
+        Supplier<StateMachine> stateMachineSupplier = () -> {
+            List<Gdl> rules = GameRepository.getDefaultRepository().getGame(gameKey).getRules();
 
-        ProverStateMachine stateMachine = new ProverStateMachine();
-        stateMachine.initialize(rules);
+            ProverStateMachine stateMachine = new ProverStateMachine();
+            stateMachine.initialize(rules);
+            return stateMachine;
+        };
 
-        return new GGPBaseGame(gameKey, stateMachine);
+        return new GGPBaseGame(gameKey, stateMachineSupplier);
     }
 
     @Override
     public GameState getInitialState() {
-        return new GGPBaseGameState(stateMachine.getInitialState());
+        StateMachine stateMachine = stateMachineSupplier.get();
+        return new GGPBaseGameState(stateMachine, stateMachine.getInitialState());
     }
 }
