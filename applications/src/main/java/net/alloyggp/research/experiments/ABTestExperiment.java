@@ -127,6 +127,14 @@ public class ABTestExperiment implements Experiment {
                    .addValue(result.getOutcomes().get().get(1));
         }
 
+        MinAndMax minAndMax = getMinAndMaxCountsForMatchups(matchupStats);
+        String nMatches = (minAndMax.min == minAndMax.max)
+                ? minAndMax.min + " matches"
+                : "between " + minAndMax.min + " and " + minAndMax.max + " matches" ;
+        sb.append("<p>Sample size for each cell is ");
+        sb.append(nMatches);
+        sb.append(".</p>\n");
+
         List<String> sortedStrategies = Lists.newArrayList(strategyIds);
         sortedStrategies.removeIf(strategy -> strategyStats.get(strategy).getN() == 0);
         sortedStrategies.sort(Comparator.comparing(strategy -> strategyStats.get(strategy).getMean()).reversed());
@@ -168,9 +176,39 @@ public class ABTestExperiment implements Experiment {
         sb.append("</table>\n");
     }
 
+    private MinAndMax getMinAndMaxCountsForMatchups(Map<List<String>, SummaryStatistics> matchupStats) {
+        long minSeen = Integer.MAX_VALUE;
+        long maxSeen = 0;
+        for (String strategy1 : strategyIds) {
+            for (String strategy2 : strategyIds) {
+                if (!strategy1.equals(strategy2)) {
+                    long count = matchupStats.get(ImmutableList.of(strategy1, strategy2)).getN();
+                    if (count < minSeen) {
+                        minSeen = count;
+                    }
+                    if (count > maxSeen) {
+                        maxSeen = count;
+                    }
+                }
+            }
+        }
+        return new MinAndMax(minSeen, maxSeen);
+    }
+
     private static NumberFormat getThreeDigitDecimalFormat() {
         NumberFormat numberFormat = NumberFormat.getInstance();
         numberFormat.setMaximumFractionDigits(3);
         return numberFormat;
+    }
+
+    // TODO: Utility?
+    public final class MinAndMax {
+        public final long min;
+        public final long max;
+
+        public MinAndMax(long min, long max) {
+            this.min = min;
+            this.max = max;
+        }
     }
 }
