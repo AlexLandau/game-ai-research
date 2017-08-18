@@ -13,5 +13,7 @@ dependencies {
     compile project(':strategies-java')
     compile project(':strategies-kotlin')
 
+    compileOnly 'org.immutables:value:2.5.5'
+
     compile 'org.apache.commons:commons-math3:3.6.1'
 }

@@ -11,10 +11,12 @@ import java.util.SortedSet;
 import javax.annotation.Nullable;
 
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
+import org.immutables.value.Value;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.LinkedHashMultiset;
@@ -34,68 +36,42 @@ import net.alloyggp.research.strategy.parameter.StrategyParameterDescription;
 import net.alloyggp.research.strategy.parameter.StrategyParameters;
 
 //TODO: Add information about error counts
-public class ParameterChartExperiment<T> implements Experiment {
-    private final String experimentName;
-    private final StrategyProvider strategyProvider;
-    private final StrategyParameters initialParameters;
-    private final StrategyParameterDescription<T> parameterToVary;
-    private final ImmutableList<String> unparsedParameterValues;
-    private final ImmutableList<Game> games;
-    private final int iterationsPerConfiguration;
-
-    private ParameterChartExperiment(String experimentName,
-            StrategyProvider strategyProvider,
-            StrategyParameters initialParameters,
-            StrategyParameterDescription<T> parameterToVary,
-            ImmutableList<String> unparsedParameterValues,
-            ImmutableList<Game> games, int iterationsPerConfiguration) {
-        this.experimentName = experimentName;
-        this.strategyProvider = strategyProvider;
-        this.initialParameters = initialParameters;
-        this.parameterToVary = parameterToVary;
-        this.unparsedParameterValues = unparsedParameterValues;
-        this.games = games;
-        this.iterationsPerConfiguration = iterationsPerConfiguration;
-    }
-
-    public static <T> ParameterChartExperiment<T> create(String experimentName,
-            StrategyProvider strategyProvider,
-            StrategyParameters initialParameters,
-            StrategyParameterDescription<T> parameterToVary,
-            ImmutableList<String> unparsedParameterValues,
-            ImmutableList<Game> games, int iterationsPerConfiguration) {
-        return new ParameterChartExperiment<T>(experimentName,
-                strategyProvider,
-                initialParameters,
-                parameterToVary,
-                unparsedParameterValues,
-                games,
-                iterationsPerConfiguration);
-    }
+@Value.Immutable
+public abstract class ParameterChartExperiment<T> implements Experiment {
+    protected abstract String experimentName();
+    protected abstract StrategyProvider strategyProvider();
+    protected abstract StrategyParameters initialParameters();
+    protected abstract StrategyParameterDescription<?> parameterToVary();
+    protected abstract ImmutableListMultimap<Game, String> unparsedParameterValuesByGame();
+    protected abstract int iterationsPerConfiguration();
 
     @Override
     public String getName() {
-        return experimentName;
+        return experimentName();
+    }
+
+    private Set<Game> games() {
+        return unparsedParameterValuesByGame().keySet();
     }
 
     @Override
     public Multiset<MatchSpec> getMatchesToRun() {
         Multiset<MatchSpec> matchSpecs = LinkedHashMultiset.create();
 
-        for (Game game : games) {
-            for (String paramValue1 : unparsedParameterValues) {
-                for (String paramValue2 : unparsedParameterValues) {
-                    String strategyId1 = StrategyRegistry.getId(strategyProvider, initialParameters
-                            .withParsed(parameterToVary, paramValue1));
-                    String strategyId2 = StrategyRegistry.getId(strategyProvider, initialParameters
-                            .withParsed(parameterToVary, paramValue2));
+        for (Game game : games()) {
+            for (String paramValue1 : unparsedParameterValuesByGame().get(game)) {
+                for (String paramValue2 : unparsedParameterValuesByGame().get(game)) {
+                    String strategyId1 = StrategyRegistry.getId(strategyProvider(), initialParameters()
+                            .withParsed(parameterToVary(), paramValue1));
+                    String strategyId2 = StrategyRegistry.getId(strategyProvider(), initialParameters()
+                            .withParsed(parameterToVary(), paramValue2));
 
                     matchSpecs.setCount(ImmutableMatchSpec.builder()
-                        .experimentName(experimentName)
+                        .experimentName(experimentName())
                         .gameId(game.getId())
                         .addStrategyIds(strategyId1, strategyId2)
                         .build(),
-                        iterationsPerConfiguration);
+                        iterationsPerConfiguration());
                 }
             }
         }
@@ -110,7 +86,7 @@ public class ParameterChartExperiment<T> implements Experiment {
     }
 
     private String getParameterStringFromStrategyId(String strategyId) {
-        String value = StrategyRegistry.getParametersFromId(strategyId).get(parameterToVary.getName());
+        String value = StrategyRegistry.getParametersFromId(strategyId).get(parameterToVary().getName());
         if (value == null) {
             throw new NullPointerException("");
         }
@@ -130,22 +106,24 @@ public class ParameterChartExperiment<T> implements Experiment {
         sb.append("<p>Hover over a cell to see player 1's average score on a scale from 0 to 1, followed by the average seconds taken per match.</p>\n");
 
         for (String gameId : ImmutableSortedSet.copyOf(groupedResultsByGameId.keySet())) {
+            Game game = Game.valueOf(gameId);
             sb.append("<h1>" + Game.valueOf(gameId).getDisplayName() + "</h1>\n");
-            writeSampleSizeAndTimingNote(sb, groupedResultsByGameId.get(gameId));
-            writeTableForResults(sb, groupedResultsByGameId.get(gameId));
-            writeTablesForMoveChoices(sb, groupedResultsByGameId.get(gameId));
+            writeSampleSizeAndTimingNote(sb, groupedResultsByGameId.get(gameId), game);
+            writeTableForResults(sb, groupedResultsByGameId.get(gameId), game);
+            writeTablesForMoveChoices(sb, groupedResultsByGameId.get(gameId), game);
         }
 
         sb.append("</body></html>\n");
         return sb.toString();
     }
 
-    private void writeSampleSizeAndTimingNote(StringBuilder sb, ListMultimap<List<String>, MatchResult> listMultimap) {
+    private void writeSampleSizeAndTimingNote(StringBuilder sb, ListMultimap<List<String>, MatchResult> listMultimap, Game game) {
         sb.append("<h3>");
         int minSampleSize = Integer.MAX_VALUE;
         int maxSampleSize = Integer.MIN_VALUE;
-        for (String i : this.unparsedParameterValues) {
-            for (String j : this.unparsedParameterValues) {
+        List<String> unparsedParameterValues = unparsedParameterValuesByGame().get(game);
+        for (String i : unparsedParameterValues) {
+            for (String j : unparsedParameterValues) {
                 ImmutableList<String> key = ImmutableList.of(i, j);
                 int size = listMultimap.get(key).size();
                 if (minSampleSize > size) {
@@ -183,8 +161,8 @@ public class ParameterChartExperiment<T> implements Experiment {
     }
 
     //TODO: Adjust the cell sizes and label font sizes so the cells are perfect squares, and/or convert to <svg>
-    private void writeTableForResults(StringBuilder sb, ListMultimap<List<String>, MatchResult> listMultimap) {
-
+    private void writeTableForResults(StringBuilder sb, ListMultimap<List<String>, MatchResult> listMultimap, Game game) {
+        List<String> unparsedParameterValues = unparsedParameterValuesByGame().get(game);
         sb.append("<table class='outcomes-table' style='border-collapse: collapse'>\n");
 
         // Remember to also change the description at the top of the report
@@ -360,13 +338,21 @@ public class ParameterChartExperiment<T> implements Experiment {
 
     private Map<String, ListMultimap<List<String>, MatchResult>> groupResults(List<MatchResult> abfResults) {
         Map<String, ListMultimap<List<String>, MatchResult>> results = Maps.newHashMap();
-        Set<String> relevantParameters = ImmutableSet.copyOf(unparsedParameterValues);
+
+        Map<String, Set<String>> relevantParametersByGameId = Maps.newHashMap();
+        for (Game game : games()) {
+            relevantParametersByGameId.put(game.getId(), ImmutableSet.copyOf(unparsedParameterValuesByGame().get(game)));
+        }
 
         for (MatchResult entry : abfResults) {
+            if (!relevantParametersByGameId.containsKey(entry.getSpec().getGameId())) {
+                continue;
+            }
             if (!results.containsKey(entry.getSpec().getGameId())) {
                 results.put(entry.getSpec().getGameId(), ArrayListMultimap.create());
             }
             List<String> parameterValues = getUnparsedParameterValues(entry);
+            Set<String> relevantParameters = relevantParametersByGameId.get(entry.getSpec().getGameId());
             if (!parameterValues.stream().allMatch(relevantParameters::contains)) {
                 // This match involves some parameter value we used to care about but no longer
                 // do; exclude it from the beginning here to avoid it showing up in some parts
@@ -379,19 +365,20 @@ public class ParameterChartExperiment<T> implements Experiment {
     }
 
     private void writeTablesForMoveChoices(StringBuilder sb,
-            ListMultimap<List<String>, MatchResult> results) {
-        writeMoveChoiceTableForPlayer(0, sb, results);
-        writeMoveChoiceTableForPlayer(1, sb, results);
+            ListMultimap<List<String>, MatchResult> results, Game game) {
+        writeMoveChoiceTableForPlayer(0, sb, results, game);
+        writeMoveChoiceTableForPlayer(1, sb, results, game);
     }
 
     private void writeMoveChoiceTableForPlayer(int roleIndex, StringBuilder sb,
-            ListMultimap<List<String>, MatchResult> results) {
+            ListMultimap<List<String>, MatchResult> results, Game game) {
         NumberFormat numberFormat = getThreeDigitDecimalFormat();
         sb.append("<h3>First move choice for player "+(roleIndex + 1)+"</h3>\n");
+        ImmutableList<String> unparsedParameterValues = unparsedParameterValuesByGame().get(game);
 
         // Rows are possible moves, columns are parameter settings, cells are probabilities
         List<String> allFirstMovesForPlayer = getAllFirstMovesForPlayer(roleIndex, results);
-        Map<String, Multiset<String>> countsByMoveByParamValue = getCountsByMoveByParamValue(roleIndex, results);
+        Map<String, Multiset<String>> countsByMoveByParamValue = getCountsByMoveByParamValue(roleIndex, results, game);
 
         sb.append("<table>\n");
 
@@ -430,9 +417,9 @@ public class ParameterChartExperiment<T> implements Experiment {
     }
 
     private Map<String, Multiset<String>> getCountsByMoveByParamValue(int roleIndex,
-            ListMultimap<List<String>, MatchResult> results) {
+            ListMultimap<List<String>, MatchResult> results, Game game) {
         Map<String, Multiset<String>> countsByMoveByParamValue = Maps.newHashMap();
-        for (String paramValue : unparsedParameterValues) {
+        for (String paramValue : unparsedParameterValuesByGame().get(game)) {
             countsByMoveByParamValue.put(paramValue, HashMultiset.create());
         }
         for (Entry<List<String>, MatchResult> entry : results.entries()) {
@@ -452,5 +439,10 @@ public class ParameterChartExperiment<T> implements Experiment {
             moves.add(firstMove);
         }
         return ImmutableList.copyOf(moves);
+    }
+
+    public static ImmutableParameterChartExperiment.Builder build(String experimentName) {
+        return ImmutableParameterChartExperiment.builder()
+                .experimentName(experimentName);
     }
 }

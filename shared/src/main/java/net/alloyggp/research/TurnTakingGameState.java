@@ -8,7 +8,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
 public interface TurnTakingGameState {
-    Move getMoveWithName(String name);
+    Move getMoveWithName(GameState gameState, int role, String name);
     int getRoleToMove();
     List<Move> getPossibleMoves();
     TurnTakingGameState getNextState(Move moveTaken);
@@ -87,8 +87,8 @@ public interface TurnTakingGameState {
             }
 
             @Override
-            public Move getMoveWithName(String name) {
-                return delegate.getMoveWithName(name);
+            public Move getMoveWithName(GameState gameState, int role, String name) {
+                return delegate.getMoveWithName(gameState, role, name);
             }
         };
     }

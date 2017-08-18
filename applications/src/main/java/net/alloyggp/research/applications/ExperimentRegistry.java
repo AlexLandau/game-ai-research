@@ -18,26 +18,25 @@ public class ExperimentRegistry {
         return ImmutableList.of(
 
                 // Sample experiment 1
-                ParameterChartExperiment.create(
-                        "TestUctChartExperiment",
-                        new MemorylessUCTStrategyProvider(),
-                        StrategyParameters.empty(),
-                        MemorylessUCTStrategyProvider.getITERATION_COUNT(),
-                        ImmutableList.of("10", "20", "40", "80", "160", "320", "640", "1280", "2560"),
-                        ImmutableList.of(Game.TIC_TAC_TOE),
-                        50),
+                ParameterChartExperiment.build("TestUctChartExperiment")
+                        .strategyProvider(new MemorylessUCTStrategyProvider())
+                        .initialParameters(StrategyParameters.empty())
+                        .parameterToVary(MemorylessUCTStrategyProvider.getITERATION_COUNT())
+                        .putUnparsedParameterValuesByGame(Game.TIC_TAC_TOE, "10", "20", "40", "80", "160", "320", "640", "1280", "2560", "5120")
+                        .putUnparsedParameterValuesByGame(Game.CONNECT_4_8x6, "10", "20", "40", "80", "160", "320", "640", "1280", "2560")
+                        .iterationsPerConfiguration(50)
+                        .build(),
 
                 // Sample experiment 2
-                ParameterChartExperiment.create(
-                        "TestDFSChartExperiment",
-                        new NPlyLookaheadStrategyProvider(),
-                        StrategyParameters.builder()
+                ParameterChartExperiment.build("TestDFSChartExperiment")
+                        .strategyProvider(new NPlyLookaheadStrategyProvider())
+                        .initialParameters(StrategyParameters.builder()
                             .put(NPlyLookaheadStrategyProvider.DEFAULT_OUTCOME, 0.5)
-                            .build(),
-                        NPlyLookaheadStrategyProvider.PLIES_TO_LOOK_AHEAD,
-                        ImmutableList.of("1", "2", "3", "4", "5", "6", "7", "8", "9"),
-                        ImmutableList.of(Game.TIC_TAC_TOE),
-                        30),
+                            .build())
+                        .parameterToVary(NPlyLookaheadStrategyProvider.PLIES_TO_LOOK_AHEAD)
+                        .putUnparsedParameterValuesByGame(Game.TIC_TAC_TOE, "1", "2", "3", "4", "5", "6", "7", "8", "9")
+                        .iterationsPerConfiguration(30)
+                        .build(),
 
                 // Sample A/B test experiment
                 new ABTestExperiment(

@@ -5,35 +5,48 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import org.ggp.base.util.game.GameRepository;
+import org.ggp.base.util.gdl.factory.GdlFactory;
 import org.ggp.base.util.gdl.grammar.Gdl;
-import org.ggp.base.util.statemachine.MachineState;
-import org.ggp.base.util.statemachine.StateMachine;
-import org.ggp.base.util.statemachine.exceptions.GoalDefinitionException;
-import org.ggp.base.util.statemachine.exceptions.MoveDefinitionException;
-import org.ggp.base.util.statemachine.exceptions.TransitionDefinitionException;
-import org.ggp.base.util.statemachine.implementation.prover.ProverStateMachine;
-import org.ggp.base.util.statemachine.sancho.SanchoStateMachineFactory;
+import org.ggp.base.util.gdl.grammar.GdlTerm;
+import org.ggp.base.util.ruleengine.GameDescriptionException;
+import org.ggp.base.util.ruleengine.RuleEngine;
+import org.ggp.base.util.ruleengine.RuleEngineState;
+import org.ggp.base.util.ruleengine.Translator;
+import org.ggp.base.util.ruleengine.prover.ProverRuleEngineFactory;
+import org.ggp.base.util.statemachine.sancho.ForwardDeadReckonPropnetRuleEngine;
+import org.ggp.base.util.statemachine.sancho.SanchoRuleEngineFactory;
+import org.ggp.base.util.symbol.factory.exceptions.SymbolFormatException;
 
 import net.alloyggp.research.GameState;
 import net.alloyggp.research.GameTreeProvider;
 import net.alloyggp.research.Move;
 
 public final class GGPBaseGame implements GameTreeProvider {
-    public class GGPBaseMove extends Move {
-        public final org.ggp.base.util.statemachine.Move move;
+    public class GGPBaseMove<M> extends Move {
+        public final M move;
+        private final Translator<M, ?> translator;
 
-        public GGPBaseMove(org.ggp.base.util.statemachine.Move move) {
+        public GGPBaseMove(M move, Translator<M, ?> translator) {
             this.move = move;
+            this.translator = translator;
+        }
+
+        private transient volatile GdlTerm gdlMove;
+        private GdlTerm getGdlMove() {
+            if (gdlMove == null) {
+                gdlMove = translator.getGdlMove(move);
+            }
+            return gdlMove;
         }
 
         @Override
         public String getName() {
-            return move.toString();
+            return getGdlMove().toString();
         }
 
         @Override
         public String toString() {
-            return move.toString();
+            return getGdlMove().toString();
         }
 
         @Override
@@ -41,7 +54,7 @@ public final class GGPBaseGame implements GameTreeProvider {
             final int prime = 31;
             int result = 1;
             result = prime * result + getOuterType().hashCode();
-            result = prime * result + ((move == null) ? 0 : move.hashCode());
+            result = prime * result + ((getGdlMove() == null) ? 0 : getGdlMove().hashCode());
             return result;
         }
 
@@ -56,10 +69,10 @@ public final class GGPBaseGame implements GameTreeProvider {
             GGPBaseMove other = (GGPBaseMove) obj;
             if (!getOuterType().equals(other.getOuterType()))
                 return false;
-            if (move == null) {
-                if (other.move != null)
+            if (getGdlMove() == null) {
+                if (other.getGdlMove() != null)
                     return false;
-            } else if (!move.equals(other.move))
+            } else if (!getGdlMove().equals(other.getGdlMove()))
                 return false;
             return true;
         }
@@ -69,106 +82,122 @@ public final class GGPBaseGame implements GameTreeProvider {
         }
     }
 
-    public final class GGPBaseGameState implements GameState {
-        private final StateMachine stateMachine;
-        private final MachineState state;
+    public final class GGPBaseGameState<NativeMove, State extends RuleEngineState<NativeMove, State>> implements GameState {
+        private final RuleEngine<NativeMove, State> ruleEngine;
+        private final State state;
 
-        private GGPBaseGameState(StateMachine stateMachine,
-                MachineState state) {
-            this.stateMachine = stateMachine;
+        private GGPBaseGameState(RuleEngine<NativeMove, State> ruleEngine, State state) {
+            this.ruleEngine = ruleEngine;
             this.state = state;
         }
 
         @Override
-        public Move getMoveWithName(String name) {
-            return new GGPBaseMove(org.ggp.base.util.statemachine.Move.create(name));
+        public Move getMoveWithName(GameState state, int roleIndex, String name) {
+            if (!(state instanceof GGPBaseGameState)) {
+                throw new IllegalArgumentException("Passed in a state from a different game type");
+            }
+            try {
+                GdlTerm term = GdlFactory.createTerm(name);
+                NativeMove nativeMove = ruleEngine.getTranslator().getNativeMove((State) ((GGPBaseGameState)state).state, roleIndex, term);
+
+                return new GGPBaseMove<>(nativeMove, ruleEngine.getTranslator());
+            } catch (SymbolFormatException e) {
+                throw new RuntimeException("Couldn't parse " + name + " as a GDL move", e);
+            }
         }
 
         @Override
         public List<Move> getPossibleMovesForRole(int role) {
             try {
-                return stateMachine.getLegalMoves(state, stateMachine.getRoles().get(role)).stream()
-                        .map(ggpBaseMove -> new GGPBaseMove(ggpBaseMove))
+                return ruleEngine.getLegalMoves(state, role).stream()
+                        .map(nativeMove -> new GGPBaseMove<>(nativeMove, ruleEngine.getTranslator()))
                         .collect(Collectors.toList());
-            } catch (MoveDefinitionException e) {
+            } catch (GameDescriptionException e) {
                 throw new RuntimeException("Error in GGP-Base game " + gameKey, e);
             }
         }
 
         @Override
         public GameState getNextState(List<Move> movesTaken) {
-            List<org.ggp.base.util.statemachine.Move> ggpBaseMoves = movesTaken.stream()
-                .map(move -> ((GGPBaseMove) move).move)
-                .collect(Collectors.toList());
             try {
-                MachineState nextState = stateMachine.getNextState(state, ggpBaseMoves);
-                return new GGPBaseGameState(stateMachine, nextState);
-            } catch (TransitionDefinitionException e) {
+                State nextState = ruleEngine.getNextState(this.state, toNativeMoves(movesTaken));
+
+                return new GGPBaseGameState<>(ruleEngine, nextState);
+            } catch (GameDescriptionException e) {
                 throw new RuntimeException("Error in GGP-Base game " + gameKey, e);
             }
         }
 
+        private List<NativeMove> toNativeMoves(List<Move> moves) {
+            return moves.stream()
+                    .map(move -> (GGPBaseMove<NativeMove>) move)
+                    .map(move -> move.move)
+                    .collect(Collectors.toList());
+        }
+
         @Override
         public boolean isTerminal() {
-            return stateMachine.isTerminal(state);
+            return ruleEngine.isTerminal(state);
         }
 
         @Override
         public double getOutcomeForRole(int role) {
             try {
-                int intValue = stateMachine.getGoal(state, stateMachine.getRoles().get(role));
+                int intValue = ruleEngine.getGoal(state, role);
                 return intValue / 100.0;
-            } catch (GoalDefinitionException e) {
+            } catch (GameDescriptionException e) {
                 throw new RuntimeException("Error in GGP-Base game " + gameKey, e);
             }
         }
     }
 
     private final String gameKey;
-    private final Supplier<StateMachine> stateMachineSupplier;
+    private final Supplier<RuleEngine<?, ?>> ruleEngineSupplier;
 
     private GGPBaseGame(String gameKey,
-            Supplier<StateMachine> stateMachineSupplier) {
+            Supplier<RuleEngine<?, ?>> ruleEngineSupplier) {
         this.gameKey = gameKey;
-        this.stateMachineSupplier = stateMachineSupplier;
+        this.ruleEngineSupplier = ruleEngineSupplier;
     }
 
     public static GameTreeProvider usingProver(String gameKey) {
-        Supplier<StateMachine> stateMachineSupplier = () -> {
+        Supplier<RuleEngine<?, ?>> ruleEngineSupplier = () -> {
             List<Gdl> rules = GameRepository.getDefaultRepository().getGame(gameKey).getRules();
 
-            ProverStateMachine stateMachine = new ProverStateMachine();
-            stateMachine.initialize(rules);
-            return stateMachine;
+            return ProverRuleEngineFactory.createNormal().buildEngineForRules(rules);
         };
 
-        return new GGPBaseGame(gameKey, stateMachineSupplier);
+        return new GGPBaseGame(gameKey, ruleEngineSupplier);
     }
 
-    private static final ThreadLocal<StateMachine> SANCHO_ENGINE_CACHE = new ThreadLocal<StateMachine>();
-    private static final ThreadLocal<String> SANCHO_ENGINE_CACHE_KEY = new ThreadLocal<String>();
+    private static final ThreadLocal<ForwardDeadReckonPropnetRuleEngine> SANCHO_ENGINE_CACHE = new ThreadLocal<>();
+    private static final ThreadLocal<String> SANCHO_ENGINE_CACHE_KEY = new ThreadLocal<>();
 
     public static GameTreeProvider usingSanchoEngine(String gameKey) {
-        Supplier<StateMachine> stateMachineSupplier = () -> {
+        Supplier<RuleEngine<?, ?>> ruleEngineSupplier = () -> {
             if (gameKey.equals(SANCHO_ENGINE_CACHE_KEY.get())) {
                 return SANCHO_ENGINE_CACHE.get();
             } else {
                 SANCHO_ENGINE_CACHE.remove(); // just in case this reduces memory pressure
                 List<Gdl> rules = GameRepository.getDefaultRepository().getGame(gameKey).getRules();
                 // Note: This takes 5+ seconds.
-                StateMachine stateMachine = SanchoStateMachineFactory.INSTANCE.buildInitializedForRules(rules);
+                ForwardDeadReckonPropnetRuleEngine ruleEngine = SanchoRuleEngineFactory.INSTANCE.buildEngineForRules(rules);
                 SANCHO_ENGINE_CACHE_KEY.set(gameKey);
-                SANCHO_ENGINE_CACHE.set(stateMachine);
-                return stateMachine;
+                SANCHO_ENGINE_CACHE.set(ruleEngine);
+                return ruleEngine;
             }
         };
 
-        return new GGPBaseGame(gameKey, stateMachineSupplier);
+        return new GGPBaseGame(gameKey, ruleEngineSupplier);
     }
 
     @Override
     public GameState getInitialState() {
-        StateMachine stateMachine = stateMachineSupplier.get();
-        return new GGPBaseGameState(stateMachine, stateMachine.getInitialState());
+        RuleEngine<?, ?> ruleEngine = ruleEngineSupplier.get();
+        return getInitialState(ruleEngine);
+    }
+
+    private <M, S extends RuleEngineState<M, S>> GameState getInitialState(RuleEngine<M, S> ruleEngine) {
+        return new GGPBaseGameState<>(ruleEngine, ruleEngine.getInitialState());
     }
 }

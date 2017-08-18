@@ -13,7 +13,14 @@ import net.alloyggp.research.game.GGPBaseGame;
  */
 // TODO: Unit test to ensure no two have same display name
 public enum Game {
-    BLOCKER("Blocker", GGPBaseGame.usingProver("blocker"), Simultaneous.YES),
+    BIDDING_TIC_TAC_TOE("Bidding tic-tac-toe", GGPBaseGame.usingSanchoEngine("biddingTicTacToe"), Simultaneous.YES),
+    BLOCKER("Blocker", GGPBaseGame.usingSanchoEngine("blocker"), Simultaneous.YES),
+    BREAKTHROUGH("Breakthrough", GGPBaseGame.usingSanchoEngine("breakthrough"), Simultaneous.NO),
+    CONNECT_4_8x6("Connect Four (8x6)", GGPBaseGame.usingSanchoEngine("connectFour"), Simultaneous.NO),
+    CONNECT_4_9x6("Connect Four (9x6)", GGPBaseGame.usingSanchoEngine("connectFour_9x6"), Simultaneous.NO),
+    DOTS_AND_BOXES("Dots and Boxes (5x5)", GGPBaseGame.usingSanchoEngine("dotsAndBoxes"), Simultaneous.NO),
+    ENGLISH_DRAUGHTS("English Draughts", GGPBaseGame.usingSanchoEngine("englishDraughts"), Simultaneous.NO),
+    PENTAGO("Pentago", GGPBaseGame.usingSanchoEngine("pentago"), Simultaneous.NO),
     TIC_TAC_TOE("Tic-tac-toe", GGPBaseGame.usingSanchoEngine("ticTacToe"), Simultaneous.NO),
     ;
     private final String displayName;
