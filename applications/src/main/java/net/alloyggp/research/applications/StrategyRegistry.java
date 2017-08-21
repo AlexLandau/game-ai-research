@@ -10,6 +10,7 @@ import com.google.common.collect.Maps;
 import net.alloyggp.research.Strategy;
 import net.alloyggp.research.StrategyProvider;
 import net.alloyggp.research.strategy.MemorylessUCTStrategyProvider;
+import net.alloyggp.research.strategy.MemorylessUCTWinsFirstStrategyProvider;
 import net.alloyggp.research.strategy.NPlyLookaheadStrategyProvider;
 import net.alloyggp.research.strategy.RandomStrategyProvider;
 import net.alloyggp.research.strategy.parameter.StrategyParameterDescription;
@@ -27,6 +28,7 @@ public class StrategyRegistry {
         add(strategyProviders, new RandomStrategyProvider());
         add(strategyProviders, new NPlyLookaheadStrategyProvider());
         add(strategyProviders, new MemorylessUCTStrategyProvider());
+        add(strategyProviders, new MemorylessUCTWinsFirstStrategyProvider());
 
         return strategyProviders;
     }

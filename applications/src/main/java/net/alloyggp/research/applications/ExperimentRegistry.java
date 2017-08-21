@@ -24,6 +24,9 @@ public class ExperimentRegistry {
                         .parameterToVary(MemorylessUCTStrategyProvider.getITERATION_COUNT())
                         .putUnparsedParameterValuesByGame(Game.TIC_TAC_TOE, "10", "20", "40", "80", "160", "320", "640", "1280", "2560", "5120")
                         .putUnparsedParameterValuesByGame(Game.CONNECT_4_8x6, "10", "20", "40", "80", "160", "320", "640", "1280", "2560")
+                        .putUnparsedParameterValuesByGame(Game.DOTS_AND_BOXES, "10", "20", "40", "80", "160")
+                        .putUnparsedParameterValuesByGame(Game.ENGLISH_DRAUGHTS, "10", "20", "40", "80", "160", "320", "640", "1280", "2560")
+                        .putUnparsedParameterValuesByGame(Game.BREAKTHROUGH, "10", "20", "40", "80", "160", "320", "640", "1280", "2560")
                         .iterationsPerConfiguration(50)
                         .build(),
 
@@ -45,6 +48,9 @@ public class ExperimentRegistry {
                                 "UCT:iterationCount=20",
                                 "UCT:iterationCount=200",
                                 "UCT:iterationCount=2000",
+                                "UCTWinsFirst:iterationCount=20",
+                                "UCTWinsFirst:iterationCount=200",
+                                "UCTWinsFirst:iterationCount=2000",
                                 "Random",
                                 "NPlyLookahead:defaultOutcome=0.5:pliesToLookAhead=1",
                                 "NPlyLookahead:defaultOutcome=0.5:pliesToLookAhead=5",
