@@ -146,6 +146,11 @@ public final class GGPBaseGame implements GameTreeProvider {
                 throw new RuntimeException("Error in GGP-Base game " + gameKey, e);
             }
         }
+
+        @Override
+        public int getNumRoles() {
+            return ruleEngine.getNumRoles();
+        }
     }
 
     private final String gameKey;

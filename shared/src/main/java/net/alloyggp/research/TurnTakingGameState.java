@@ -1,6 +1,7 @@
 package net.alloyggp.research;
 
 import java.util.List;
+import java.util.Random;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -15,6 +16,7 @@ public interface TurnTakingGameState {
     TurnTakingGameState getNextState(Move moveTaken);
     boolean isTerminal();
     double getOutcomeForRole(int role);
+    int getNumRoles();
 
     default List<TurnTakingGameState> getPossibleNextStates() {
         return getPossibleMoves().stream()
@@ -22,11 +24,18 @@ public interface TurnTakingGameState {
                 .collect(Collectors.toList());
     }
 
-    default List<Double> getOutcomes(int numPlayers) {
-        return IntStream.range(0, numPlayers)
+    default List<Double> getOutcomes() {
+        return IntStream.range(0, getNumRoles())
                 .mapToDouble(this::getOutcomeForRole)
                 .boxed()
                 .collect(Collectors.toList());
+    }
+
+    default TurnTakingGameState getRandomNextState(Random random) {
+        List<Move> possibleMoves = getPossibleMoves();
+        int index = random.nextInt(possibleMoves.size());
+        Move chosenMove = possibleMoves.get(index);
+        return getNextState(chosenMove);
     }
 
     public static TurnTakingGameState wrap(GameState delegate) {
@@ -90,6 +99,11 @@ public interface TurnTakingGameState {
             @Override
             public Move getMoveWithName(int role, String name) {
                 return delegate.getMoveWithName(role, name);
+            }
+
+            @Override
+            public int getNumRoles() {
+                return delegate.getNumRoles();
             }
         };
     }

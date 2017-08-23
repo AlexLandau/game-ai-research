@@ -10,7 +10,7 @@ import net.alloyggp.research.applications.Game;
 import net.alloyggp.research.applications.MatchResults;
 import net.alloyggp.research.applications.MatchRunner;
 import net.alloyggp.research.applications.StrategyRegistry;
-import net.alloyggp.research.strategy.MemorylessUCTStrategyProvider;
+import net.alloyggp.research.strategy.MemorylessUCTRecordAllNodesStrategyProvider;
 import net.alloyggp.research.strategy.RandomStrategyProvider;
 import net.alloyggp.research.strategy.parameter.StrategyParameters;
 
@@ -35,9 +35,9 @@ public class SingleMatchRunner {
 //                .put(NPlyLookaheadStrategyProvider.PLIES_TO_LOOK_AHEAD, 9)
 //                .put(NPlyLookaheadStrategyProvider.DEFAULT_OUTCOME, 0.5)
 //                .build();
-        StrategyProvider strategy2 = new MemorylessUCTStrategyProvider();
+        StrategyProvider strategy2 = new MemorylessUCTRecordAllNodesStrategyProvider();
         StrategyParameters params2 = StrategyParameters.builder()
-                .put(MemorylessUCTStrategyProvider.getITERATION_COUNT(), 50)
+                .put(MemorylessUCTRecordAllNodesStrategyProvider.getITERATION_COUNT(), 50)
                 .build();
 
         return ImmutableMatchSpec.builder()

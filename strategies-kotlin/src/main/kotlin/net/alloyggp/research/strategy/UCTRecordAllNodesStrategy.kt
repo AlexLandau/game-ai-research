@@ -8,6 +8,8 @@ import net.alloyggp.research.StrategyProvider
 import net.alloyggp.research.TurnTakingGameState
 import net.alloyggp.research.strategy.parameter.StrategyParameterDescription
 import net.alloyggp.research.strategy.parameter.StrategyParameters
+import net.alloyggp.research.strategy.util.StateNode
+import net.alloyggp.research.strategy.util.SumAndCountArray
 import java.util.ArrayList
 import java.util.LinkedHashMap
 import java.util.Random
@@ -25,7 +27,7 @@ import java.util.Random
  * http://ggp.stanford.edu/readings/uct.pdf
  * https://pdfs.semanticscholar.org/a441/488e8fe40370b7f5f99eb5a1659d93fb7091.pdf
  */
-class MemorylessUCTStrategyProvider: StrategyProvider {
+class MemorylessUCTRecordAllNodesStrategyProvider: StrategyProvider {
     companion object {
         @JvmStatic
         val C_P: StrategyParameterDescription<Double> = StrategyParameterDescription.forDouble("c_p").min(0.0).defaultValue(Math.sqrt(2.0)).build()
@@ -123,63 +125,14 @@ class MemorylessUCTPlayer(val iterationsPerTurn: Int, val c_p: Double, val roleI
 
 private fun makeNode(currentState: TurnTakingGameState): StateNode {
     if (currentState.isTerminal) {
-        return StateNode.TerminalNode(currentState.getOutcomes(2))
+        return StateNode.TerminalNode(currentState.getOutcomes())
     }
 
     val initialChildStats = LinkedHashMap<Move, SumAndCountArray>()
     for (move in currentState.possibleMoves) {
-        initialChildStats[move] = SumAndCountArray.create(2)
+        initialChildStats[move] = SumAndCountArray.create(currentState.numRoles)
     }
     return StateNode.NonTerminalNode(childStats = initialChildStats,
             children = LinkedHashMap<Move, StateNode>(),
             activeRole = currentState.roleToMove)
-}
-
-sealed class StateNode {
-    data class TerminalNode(val outcomes: List<Double>): StateNode()
-    data class NonTerminalNode(val childStats: Map<Move, SumAndCountArray>,
-                               val children: MutableMap<Move, StateNode>,
-                               val activeRole: Int): StateNode() {
-        fun getBestMove(roleIndex: Int, random: Random): Move {
-            return MoveUtils.pickThingWithHighestScore(childStats.entries,
-                    { (_, sumAndCount) -> sumAndCount.getAverage(roleIndex) }, random).key
-        }
-    }
-}
-
-// TODO: Put in utility code file
-class SumAndCountArray(private val sums: DoubleArray, private var count: Long) {
-    companion object {
-        fun create(size: Int): SumAndCountArray {
-            val sums = DoubleArray(size, { _ -> 0.0 })
-            return SumAndCountArray(sums, 0L)
-        }
-    }
-
-    fun getAverage(roleIndex: Int): Double {
-        val sum = sums[roleIndex]
-        if (count == 0L) {
-            // TODO: Consider making a parameter?
-            return -1.0
-        }
-        return sum / count
-    }
-
-    fun getCount(): Long {
-        return count
-    }
-
-    fun addValues(outcomes: List<Double>) {
-        if (outcomes.size != sums.size) {
-            error("These should be the same size")
-        }
-        outcomes.forEachIndexed { index, value ->
-            sums[index] += value
-        }
-        count += 1L
-    }
-
-    override fun toString(): String {
-        return "$sums/$count"
-    }
 }

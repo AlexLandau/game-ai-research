@@ -2,6 +2,7 @@ package net.alloyggp.research.experiments;
 
 import java.awt.Color;
 import java.text.NumberFormat;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -21,6 +22,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.LinkedHashMultiset;
 import com.google.common.collect.ListMultimap;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multiset;
 import com.google.common.collect.Sets;
@@ -161,7 +163,7 @@ public abstract class ParameterChartExperiment<T> implements Experiment {
     }
 
     //TODO: Adjust the cell sizes and label font sizes so the cells are perfect squares, and/or convert to <svg>
-    private void writeTableForResults(StringBuilder sb, ListMultimap<List<String>, MatchResult> listMultimap, Game game) {
+    private void writeTableForResults(StringBuilder sb, ListMultimap<List<String>, MatchResult> resultsByBox, Game game) {
         List<String> unparsedParameterValues = unparsedParameterValuesByGame().get(game);
         sb.append("<table class='outcomes-table' style='border-collapse: collapse'>\n");
 
@@ -183,13 +185,15 @@ public abstract class ParameterChartExperiment<T> implements Experiment {
         sb.append(" </tr>\n");
 
         NumberFormat numberFormat = getThreeDigitDecimalFormat();
+        int errorCount = 0;
         for (int row = 0; row < unparsedParameterValues.size(); row++) {
             sb.append(" <tr>\n");
             String bgColor = getCssRgbString(colorer.getColor(1.0));
             String fontColor = getCssRgbString(colorer.getP1TextColor());
             sb.append("  <td style='background-color:"+bgColor+"; color:"+fontColor+"'>"+unparsedParameterValues.get(row)+"</td>\n");
             for (int col = 0; col < unparsedParameterValues.size(); col++) {
-                List<MatchResult> resultsInBox = listMultimap.get(ImmutableList.of(unparsedParameterValues.get(row), unparsedParameterValues.get(col)));
+                List<MatchResult> resultsInBox = Lists.newLinkedList(resultsByBox.get(ImmutableList.of(unparsedParameterValues.get(row), unparsedParameterValues.get(col))));
+                errorCount += removeErrors(resultsInBox);
                 double player1AvgVal = averageFirstPlayerScore(resultsInBox);
                 boolean isEmpty = resultsInBox.isEmpty();
                 @Nullable Double avgTimeTaken = averageSecondsTaken(resultsInBox);
@@ -204,8 +208,26 @@ public abstract class ParameterChartExperiment<T> implements Experiment {
             sb.append(" </tr>\n");
         }
         sb.append("</table>\n");
+        if (errorCount > 0) {
+            sb.append("<p>(In addition, " + errorCount + " matches were run which encountered errors.)</p>\n");
+        }
     }
 
+    /**
+     * Returns the number of matches removed from the list because they resulted in errors.
+     */
+    private int removeErrors(List<MatchResult> resultsInBox) {
+        int count = 0;
+        Iterator<MatchResult> itr = resultsInBox.iterator();
+        while (itr.hasNext()) {
+            MatchResult result = itr.next();
+            if (result.hadError()) {
+                itr.remove();
+                count++;
+            }
+        }
+        return count;
+    }
     private static String getCssRgbString(Color color) {
         return "rgb("+color.getRed()+","+color.getGreen()+","+color.getBlue()+")";
     }

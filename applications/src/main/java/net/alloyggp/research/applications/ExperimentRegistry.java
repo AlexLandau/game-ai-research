@@ -7,7 +7,7 @@ import com.google.common.collect.ImmutableList;
 import net.alloyggp.research.Experiment;
 import net.alloyggp.research.experiments.ABTestExperiment;
 import net.alloyggp.research.experiments.ParameterChartExperiment;
-import net.alloyggp.research.strategy.MemorylessUCTStrategyProvider;
+import net.alloyggp.research.strategy.MemorylessUCTOneNodeExpansionStrategyProvider;
 import net.alloyggp.research.strategy.NPlyLookaheadStrategyProvider;
 import net.alloyggp.research.strategy.parameter.StrategyParameters;
 
@@ -19,14 +19,22 @@ public class ExperimentRegistry {
 
                 // Sample experiment 1
                 ParameterChartExperiment.build("TestUctChartExperiment")
-                        .strategyProvider(new MemorylessUCTStrategyProvider())
+                        .strategyProvider(new MemorylessUCTOneNodeExpansionStrategyProvider())
                         .initialParameters(StrategyParameters.empty())
-                        .parameterToVary(MemorylessUCTStrategyProvider.getITERATION_COUNT())
+                        .parameterToVary(MemorylessUCTOneNodeExpansionStrategyProvider.getITERATION_COUNT())
                         .putUnparsedParameterValuesByGame(Game.TIC_TAC_TOE, "10", "20", "40", "80", "160", "320", "640", "1280", "2560", "5120")
                         .putUnparsedParameterValuesByGame(Game.CONNECT_4_8x6, "10", "20", "40", "80", "160", "320", "640", "1280", "2560")
-                        .putUnparsedParameterValuesByGame(Game.DOTS_AND_BOXES, "10", "20", "40", "80", "160")
+                        .putUnparsedParameterValuesByGame(Game.DOTS_AND_BOXES, "10", "20", "40", "80", "160", "320")
                         .putUnparsedParameterValuesByGame(Game.ENGLISH_DRAUGHTS, "10", "20", "40", "80", "160", "320", "640", "1280", "2560")
                         .putUnparsedParameterValuesByGame(Game.BREAKTHROUGH, "10", "20", "40", "80", "160", "320", "640", "1280", "2560")
+                        .putUnparsedParameterValuesByGame(Game.BREAKTHROUGH_6x6, "10", "20", "40", "80", "160", "320", "640", "1280", "2560")
+                        .putUnparsedParameterValuesByGame(Game.CONNECT_4_9x6, "10", "20", "40", "80", "160", "320", "640", "1280", "2560")
+                        .putUnparsedParameterValuesByGame(Game.HEX, "10", "20", "40", "80", "160", "320", "640")
+                        .putUnparsedParameterValuesByGame(Game.HEX_PIE, "10", "20", "40", "80", "160", "320", "640")
+                        .putUnparsedParameterValuesByGame(Game.MAJORITIES, "10", "20", "40", "80", "160", "320", "640", "1280", "2560")
+                        .putUnparsedParameterValuesByGame(Game.PENTAGO, "10", "20", "40", "80", "160", "320", "640", "1280", "2560")
+                        .putUnparsedParameterValuesByGame(Game.QUARTO, "10", "20", "40", "80", "160", "320", "640", "1280", "2560")
+                        .putUnparsedParameterValuesByGame(Game.REVERSI, "10", "20", "40", "80", "160", "320", "640", "1280", "2560")
                         .iterationsPerConfiguration(50)
                         .build(),
 
@@ -56,8 +64,15 @@ public class ExperimentRegistry {
                                 "NPlyLookahead:defaultOutcome=0.5:pliesToLookAhead=5",
                                 "NPlyLookahead:defaultOutcome=0.5:pliesToLookAhead=6"
                                 ),
-                        ImmutableList.of(Game.TIC_TAC_TOE),
+                        ImmutableList.of(Game.TIC_TAC_TOE,
+                                Game.BREAKTHROUGH,
+                                Game.DOTS_AND_BOXES,
+                                Game.ENGLISH_DRAUGHTS,
+                                Game.CONNECT_4_8x6,
+                                Game.CONNECT_4_9x6,
+                                Game.PENTAGO),
                         100)
+
         );
     }
 

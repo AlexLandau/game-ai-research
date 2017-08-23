@@ -60,7 +60,7 @@ public class MatchRunner {
                     player.advanceGameState(moves, state);
                 }
             }
-            ImmutableList<Double> outcome = state.getOutcomes();
+            ImmutableList<Double> outcome = ImmutableList.copyOf(state.getOutcomes());
             long millisecondsElapsed = System.currentTimeMillis() - startTime;
 
             return ImmutableMatchResult.builder()
