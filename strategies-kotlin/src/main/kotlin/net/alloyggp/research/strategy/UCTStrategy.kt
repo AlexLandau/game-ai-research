@@ -148,14 +148,10 @@ sealed class StateNode {
 }
 
 // TODO: Put in utility code file
-class SumAndCountArray(private val sums: MutableList<Double>, private var count: Long) {
+class SumAndCountArray(private val sums: DoubleArray, private var count: Long) {
     companion object {
         fun create(size: Int): SumAndCountArray {
-            val sums = ArrayList<Double>()
-            for (i in 1..size) {
-                sums.add(0.0)
-            }
-            sums.trimToSize()
+            val sums = DoubleArray(size, { _ -> 0.0 })
             return SumAndCountArray(sums, 0L)
         }
     }
