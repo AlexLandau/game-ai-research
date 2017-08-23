@@ -15,10 +15,8 @@ import net.alloyggp.research.MatchSpec;
 /**
  * This continually looks for matches that should be run for experiments, then runs them.
  *
- * TODO: Add a Gradle task for running this.
- * TODO: Pick a better name for this.
  */
-public class OngoingMatchRunner {
+public class ExperimentMatchRunner {
     public static void main(String[] args) throws IOException {
         final int numThreads;
         if (args.length > 0) {

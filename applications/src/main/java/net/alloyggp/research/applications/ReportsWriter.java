@@ -10,7 +10,6 @@ import org.ggp.base.util.files.FileUtils;
 import net.alloyggp.research.Experiment;
 import net.alloyggp.research.MatchResult;
 
-// TODO: Add a Gradle task for this.
 public class ReportsWriter {
 
     public static void main(String[] args) throws IOException {
