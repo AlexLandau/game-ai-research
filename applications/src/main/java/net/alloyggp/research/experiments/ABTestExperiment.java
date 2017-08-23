@@ -8,8 +8,8 @@ import java.util.Map;
 
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 
-import com.google.common.collect.HashMultiset;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMultiset;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -45,17 +45,17 @@ public class ABTestExperiment implements Experiment {
 
     @Override
     public Multiset<MatchSpec> getMatchesToRun() {
-        Multiset<MatchSpec> matches = HashMultiset.create();
+        ImmutableMultiset.Builder<MatchSpec> matches = ImmutableMultiset.builder();
         for (Game game : games) {
             for (int i = 0; i < strategyIds.size(); i++) {
                 for (int j = i + 1; j < strategyIds.size(); j++) {
-                    matches.add(ImmutableMatchSpec.builder()
+                    matches.addCopies(ImmutableMatchSpec.builder()
                             .experimentName(experimentName)
                             .addStrategyIds(strategyIds.get(i), strategyIds.get(j))
                             .gameId(game.getId())
                             .build(),
                             iterationsPerConfiguration);
-                    matches.add(ImmutableMatchSpec.builder()
+                    matches.addCopies(ImmutableMatchSpec.builder()
                             .experimentName(experimentName)
                             .addStrategyIds(strategyIds.get(j), strategyIds.get(i))
                             .gameId(game.getId())
@@ -64,7 +64,7 @@ public class ABTestExperiment implements Experiment {
                 }
             }
         }
-        return matches;
+        return matches.build();
     }
 
     @Override
