@@ -92,13 +92,10 @@ public final class GGPBaseGame implements GameTreeProvider {
         }
 
         @Override
-        public Move getMoveWithName(GameState state, int roleIndex, String name) {
-            if (!(state instanceof GGPBaseGameState)) {
-                throw new IllegalArgumentException("Passed in a state from a different game type");
-            }
+        public Move getMoveWithName(int roleIndex, String name) {
             try {
                 GdlTerm term = GdlFactory.createTerm(name);
-                NativeMove nativeMove = ruleEngine.getTranslator().getNativeMove((State) ((GGPBaseGameState)state).state, roleIndex, term);
+                NativeMove nativeMove = ruleEngine.getTranslator().getNativeMove(this.state, roleIndex, term);
 
                 return new GGPBaseMove<>(nativeMove, ruleEngine.getTranslator());
             } catch (SymbolFormatException e) {
