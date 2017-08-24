@@ -24,7 +24,7 @@ import java.util.Random
  *
  * This version runs a fixed number of iterations of the algorithm ("rollouts") per move.
  * It discards its game tree after each move and does not use transposition tables. It
- * adds every node visited in a rollout to its game tree.
+ * adds at most one node to its game tree per rollout.
  *
  * Original publication:
  * Kocsis, Levente, and Csaba Szepesvári. "Bandit based monte-carlo planning." ECML. Vol. 6. 2006.
@@ -75,6 +75,8 @@ class MemorylessUCTWinsFirstPlayer(val iterationsPerTurn: Int, val c_p: Double, 
 
         val nodesVisited = ArrayList<StateNode.NonTerminalNode>()
         val movesChosen = ArrayList<Move>()
+        
+        var hasExpanded = false
 
         loop@ while (true) {
             nodesVisited.add(curNode)
@@ -82,11 +84,18 @@ class MemorylessUCTWinsFirstPlayer(val iterationsPerTurn: Int, val c_p: Double, 
             movesChosen.add(moveChosen)
 
             curState = curState.getNextState(moveChosen)
-            val nextNode: StateNode = curNode.children[moveChosen] ?: {
+            val nextNode: StateNode = if (curNode.children.containsKey(moveChosen)) {
+                curNode.children[moveChosen]!!
+            } else if (!hasExpanded) {
                 val newNode = makeNode(curState)
                 curNode.children[moveChosen] = newNode
+                hasExpanded = true
                 newNode
-            }() // silly Kotlin
+            } else {
+                // Fast-forward to the end of the rollout
+                getNodeAtEndOfRandomSelections(curState)
+            }
+            
             when (nextNode) {
                 is StateNode.NonTerminalNode -> {
                     curNode = nextNode
@@ -101,6 +110,14 @@ class MemorylessUCTWinsFirstPlayer(val iterationsPerTurn: Int, val c_p: Double, 
                 }
             }
         }
+    }
+    
+    private fun getNodeAtEndOfRandomSelections(initialState: TurnTakingGameState): StateNode.TerminalNode {
+        var curState = initialState
+        while (!curState.isTerminal) {
+            curState = curState.getRandomNextState(random)
+        }
+        return StateNode.TerminalNode(curState.getOutcomes())
     }
 
     private fun chooseMoveToExplore(curNode: StateNode.NonTerminalNode, random: Random): Move {

@@ -59,7 +59,9 @@ public class ExperimentRegistry {
                         ImmutableList.of(
                                 "UCT:iterationCount=20",
                                 "UCT:iterationCount=200",
-                                "UCT:iterationCount=2000",
+                                "UCTOneNodeExpansion:iterationCount=20",
+                                "UCTOneNodeExpansion:iterationCount=200",
+                                "UCTOneNodeExpansion:iterationCount=2000",
                                 "UCTWinsFirst:iterationCount=20",
                                 "UCTWinsFirst:iterationCount=200",
                                 "UCTWinsFirst:iterationCount=2000",
