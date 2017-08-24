@@ -23,7 +23,8 @@ public class ExperimentRegistry {
                         .initialParameters(StrategyParameters.empty())
                         .parameterToVary(MemorylessUCTOneNodeExpansionStrategyProvider.getITERATION_COUNT())
                         .putUnparsedParameterValuesByGame(Game.TIC_TAC_TOE, "10", "20", "40", "80", "160", "320", "640", "1280", "2560", "5120", "10240", "20480")
-                        .putUnparsedParameterValuesByGame(Game.CONNECT_4_8x6, "10", "20", "40", "80", "160", "320", "640", "1280", "2560", "5120")
+                        .putUnparsedParameterValuesByGame(Game.CEPHALOPOD_3x3, "10", "20", "40", "80", "160", "320", "640")
+                        .putUnparsedParameterValuesByGame(Game.CONNECT_FOUR_8x6, "10", "20", "40", "80", "160", "320", "640", "1280", "2560", "5120")
                         .putUnparsedParameterValuesByGame(Game.DOTS_AND_BOXES, "10", "20", "40", "80", "160", "320", "640")
                         .putUnparsedParameterValuesByGame(Game.DOTS_AND_BOXES_MISERE, "10", "20", "40", "80", "160", "320", "640")
                         .putUnparsedParameterValuesByGame(Game.ENGLISH_DRAUGHTS, "10", "20", "40", "80", "160", "320", "640", "1280", "2560")
@@ -31,7 +32,7 @@ public class ExperimentRegistry {
                         .putUnparsedParameterValuesByGame(Game.GOMOKU_15x15, "10", "20", "40", "80", "160", "320", "640")
                         .putUnparsedParameterValuesByGame(Game.BREAKTHROUGH, "10", "20", "40", "80", "160", "320", "640", "1280", "2560")
                         .putUnparsedParameterValuesByGame(Game.BREAKTHROUGH_6x6, "10", "20", "40", "80", "160", "320", "640", "1280", "2560")
-                        .putUnparsedParameterValuesByGame(Game.CONNECT_4_9x6, "10", "20", "40", "80", "160", "320", "640", "1280", "2560", "5120")
+                        .putUnparsedParameterValuesByGame(Game.CONNECT_FOUR_9x6, "10", "20", "40", "80", "160", "320", "640", "1280", "2560", "5120")
                         .putUnparsedParameterValuesByGame(Game.HEX, "10", "20", "40", "80", "160", "320", "640")
                         .putUnparsedParameterValuesByGame(Game.HEX_PIE, "10", "20", "40", "80", "160", "320", "640")
                         .putUnparsedParameterValuesByGame(Game.MAJORITIES, "10", "20", "40", "80", "160", "320", "640", "1280", "2560")
@@ -74,8 +75,8 @@ public class ExperimentRegistry {
                                 Game.BREAKTHROUGH,
                                 Game.DOTS_AND_BOXES,
                                 Game.ENGLISH_DRAUGHTS,
-                                Game.CONNECT_4_8x6,
-                                Game.CONNECT_4_9x6,
+                                Game.CONNECT_FOUR_8x6,
+                                Game.CONNECT_FOUR_9x6,
                                 Game.PENTAGO),
                         100)
 
