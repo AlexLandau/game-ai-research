@@ -5,8 +5,6 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import org.ggp.base.util.files.FileUtils;
-
 import net.alloyggp.research.Experiment;
 import net.alloyggp.research.MatchResult;
 
@@ -22,11 +20,12 @@ public class ReportsWriter {
             String html = experiment.writeHtmlOutput(results);
 
             File reportFile = new File(reportsDir, getExperimentFilename(experiment.getName()));
-            FileUtils.writeStringToFile(reportFile, html);
+            Files.writeStringToFile(reportFile, html);
         }
 
         File indexFile = new File(reportsDir, "index.html");
-        FileUtils.writeStringToFile(indexFile, writeIndexHtml(experiments));
+        String indexHtml = writeIndexHtml(experiments);
+        Files.writeStringToFile(indexFile, indexHtml);
 
         System.out.println("Reports available at: " + indexFile.toURI());
     }

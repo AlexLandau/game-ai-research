@@ -17,7 +17,7 @@ import net.alloyggp.research.MatchSpec;
  *
  */
 public class ExperimentMatchRunner {
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, InterruptedException {
         final int numThreads;
         if (args.length > 0) {
             numThreads = Integer.parseInt(args[0]);
@@ -26,7 +26,7 @@ public class ExperimentMatchRunner {
         }
         System.out.println("Running with a thread count of " + numThreads + ".");
 
-        BlockingQueue<WorkItem> workQueue = Queues.newLinkedBlockingQueue();
+        BlockingQueue<WorkItem> workQueue = Queues.newArrayBlockingQueue(100);
         for (int i = 0; i < numThreads; i++) {
             new Thread(() -> {
                 while (true) {
@@ -58,7 +58,7 @@ public class ExperimentMatchRunner {
             enqueueMatchesForExperiment(experiment, workQueue);
         }
         for (int i = 0; i < numThreads; i++) {
-            workQueue.offer(WorkItem.stopper());
+            workQueue.put(WorkItem.stopper());
         }
     }
 
@@ -80,7 +80,7 @@ public class ExperimentMatchRunner {
         }
     }
 
-    private static void enqueueMatchesForExperiment(Experiment experiment, BlockingQueue<WorkItem> workQueue) throws IOException {
+    private static void enqueueMatchesForExperiment(Experiment experiment, BlockingQueue<WorkItem> workQueue) throws IOException, InterruptedException {
         Multiset<MatchSpec> desiredSpecCounts = experiment.getMatchesToRun();
 
         List<MatchResult> existingResults = MatchResults.loadAllResults(experiment.getName());
@@ -98,7 +98,7 @@ public class ExperimentMatchRunner {
                 int desiredCount = desiredSpecCounts.count(spec);
                 int existingCount = existingSpecCounts.count(spec);
                 if (existingCount <= i && desiredCount > i) {
-                    workQueue.offer(WorkItem.of(spec));
+                    workQueue.put(WorkItem.of(spec));
                 }
             }
         }

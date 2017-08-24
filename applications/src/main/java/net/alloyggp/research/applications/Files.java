@@ -1,6 +1,9 @@
 package net.alloyggp.research.applications;
 
 import java.io.File;
+import java.io.IOException;
+
+import com.google.common.base.Charsets;
 
 public class Files {
     private Files() {
@@ -46,6 +49,10 @@ public class Files {
         } else if (!dir.isDirectory()) {
             throw new RuntimeException("Can't make the '" + name + "' directory in " + parent + " because a non-directory file already exists there for some reason.");
         }
+    }
+
+    public static void writeStringToFile(File file, String newContents) throws IOException {
+        com.google.common.io.Files.asCharSink(file, Charsets.UTF_8).write(newContents);
     }
 
 

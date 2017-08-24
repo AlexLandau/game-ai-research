@@ -22,20 +22,24 @@ public class ExperimentRegistry {
                         .strategyProvider(new MemorylessUCTOneNodeExpansionStrategyProvider())
                         .initialParameters(StrategyParameters.empty())
                         .parameterToVary(MemorylessUCTOneNodeExpansionStrategyProvider.getITERATION_COUNT())
-                        .putUnparsedParameterValuesByGame(Game.TIC_TAC_TOE, "10", "20", "40", "80", "160", "320", "640", "1280", "2560", "5120")
-                        .putUnparsedParameterValuesByGame(Game.CONNECT_4_8x6, "10", "20", "40", "80", "160", "320", "640", "1280", "2560")
-                        .putUnparsedParameterValuesByGame(Game.DOTS_AND_BOXES, "10", "20", "40", "80", "160", "320")
+                        .putUnparsedParameterValuesByGame(Game.TIC_TAC_TOE, "10", "20", "40", "80", "160", "320", "640", "1280", "2560", "5120", "10240", "20480")
+                        .putUnparsedParameterValuesByGame(Game.CONNECT_4_8x6, "10", "20", "40", "80", "160", "320", "640", "1280", "2560", "5120")
+                        .putUnparsedParameterValuesByGame(Game.DOTS_AND_BOXES, "10", "20", "40", "80", "160", "320", "640")
+                        .putUnparsedParameterValuesByGame(Game.DOTS_AND_BOXES_MISERE, "10", "20", "40", "80", "160", "320", "640")
                         .putUnparsedParameterValuesByGame(Game.ENGLISH_DRAUGHTS, "10", "20", "40", "80", "160", "320", "640", "1280", "2560")
+                        .putUnparsedParameterValuesByGame(Game.GOMOKU_11x11, "10", "20", "40", "80", "160", "320", "640")
+                        .putUnparsedParameterValuesByGame(Game.GOMOKU_15x15, "10", "20", "40", "80", "160", "320", "640")
                         .putUnparsedParameterValuesByGame(Game.BREAKTHROUGH, "10", "20", "40", "80", "160", "320", "640", "1280", "2560")
                         .putUnparsedParameterValuesByGame(Game.BREAKTHROUGH_6x6, "10", "20", "40", "80", "160", "320", "640", "1280", "2560")
-                        .putUnparsedParameterValuesByGame(Game.CONNECT_4_9x6, "10", "20", "40", "80", "160", "320", "640", "1280", "2560")
+                        .putUnparsedParameterValuesByGame(Game.CONNECT_4_9x6, "10", "20", "40", "80", "160", "320", "640", "1280", "2560", "5120")
                         .putUnparsedParameterValuesByGame(Game.HEX, "10", "20", "40", "80", "160", "320", "640")
                         .putUnparsedParameterValuesByGame(Game.HEX_PIE, "10", "20", "40", "80", "160", "320", "640")
                         .putUnparsedParameterValuesByGame(Game.MAJORITIES, "10", "20", "40", "80", "160", "320", "640", "1280", "2560")
                         .putUnparsedParameterValuesByGame(Game.PENTAGO, "10", "20", "40", "80", "160", "320", "640", "1280", "2560")
                         .putUnparsedParameterValuesByGame(Game.QUARTO, "10", "20", "40", "80", "160", "320", "640", "1280", "2560")
                         .putUnparsedParameterValuesByGame(Game.REVERSI, "10", "20", "40", "80", "160", "320", "640", "1280", "2560")
-                        .iterationsPerConfiguration(50)
+                        // TODO: Understand what sample size we want here, in terms of effects on visual "accuracy"
+                        .iterationsPerConfiguration(100)
                         .build(),
 
                 // Sample experiment 2
@@ -46,7 +50,7 @@ public class ExperimentRegistry {
                             .build())
                         .parameterToVary(NPlyLookaheadStrategyProvider.PLIES_TO_LOOK_AHEAD)
                         .putUnparsedParameterValuesByGame(Game.TIC_TAC_TOE, "1", "2", "3", "4", "5", "6", "7", "8", "9")
-                        .iterationsPerConfiguration(30)
+                        .iterationsPerConfiguration(50)
                         .build(),
 
                 // Sample A/B test experiment
