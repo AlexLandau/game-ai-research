@@ -27,6 +27,8 @@ public enum Game {
     ENGLISH_DRAUGHTS("English Draughts", GGPBaseGame.usingSanchoEngine("englishDraughts"), Simultaneous.NO),
     GOMOKU_11x11("Gomoku (11x11)", GGPBaseGame.usingSanchoEngine("gomoku_11x11"), Simultaneous.NO),
     GOMOKU_15x15("Gomoku (15x15)", GGPBaseGame.usingSanchoEngine("gomoku_15x15"), Simultaneous.NO),
+    GOMOKU_SWAP2_11x11("Gomoku (Swap2, 11x11)", GGPBaseGame.usingSanchoEngine("gomoku_swap2_11x11"), Simultaneous.NO),
+    GOMOKU_SWAP2_15x15("Gomoku (Swap2, 15x15)", GGPBaseGame.usingSanchoEngine("gomoku_swap2_15x15"), Simultaneous.NO),
     HEX("Hex", GGPBaseGame.usingSanchoEngine("hex"), Simultaneous.NO),
     HEX_PIE("Hex (with pie rule)", GGPBaseGame.usingSanchoEngine("hexPie"), Simultaneous.NO),
     MAJORITIES("Majorities", GGPBaseGame.usingSanchoEngine("majorities"), Simultaneous.NO),
