@@ -31,8 +31,12 @@ public enum Game {
     HEX_PIE("Hex (with pie rule)", GGPBaseGame.usingSanchoEngine("hexPie"), Simultaneous.NO),
     MAJORITIES("Majorities", GGPBaseGame.usingSanchoEngine("majorities"), Simultaneous.NO),
     PENTAGO("Pentago", GGPBaseGame.usingSanchoEngine("pentago"), Simultaneous.NO),
+    PENTAGO_MISERE("Pentago Misère", GGPBaseGame.usingSanchoEngine("pentagoSuicide"), Simultaneous.NO),
     QUARTO("Quarto", GGPBaseGame.usingSanchoEngine("quarto"), Simultaneous.NO),
+    QUARTO_MISERE("Quarto Misère", GGPBaseGame.usingSanchoEngine("quartoSuicide"), Simultaneous.NO),
     REVERSI("Reversi", GGPBaseGame.usingSanchoEngine("reversi"), Simultaneous.NO),
+    REVERSI_MISERE("Reversi Misère", GGPBaseGame.usingSanchoEngine("reversiSuicide"), Simultaneous.NO),
+    SHEEP_AND_WOLF("Sheep and Wolf", GGPBaseGame.usingSanchoEngine("sheepAndWolf"), Simultaneous.NO),
     TIC_TAC_TOE("Tic-tac-toe", GGPBaseGame.usingSanchoEngine("ticTacToe"), Simultaneous.NO),
     ;
     private final String displayName;

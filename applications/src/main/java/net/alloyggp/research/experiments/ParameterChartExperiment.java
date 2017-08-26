@@ -395,13 +395,21 @@ public abstract class ParameterChartExperiment<T> implements Experiment {
     private void writeMoveChoiceTableForPlayer(int roleIndex, StringBuilder sb,
             ListMultimap<List<String>, MatchResult> results, Game game) {
         NumberFormat numberFormat = getThreeDigitDecimalFormat();
+        List<String> allFirstMovesForPlayer = getAllFirstMovesForPlayer(roleIndex, results);
+
+        if (allFirstMovesForPlayer.size() == 0) {
+            return;
+        } else if (allFirstMovesForPlayer.size() == 1) {
+            sb.append("<h4>First move choice for player "+(roleIndex + 1)+" is always \""+allFirstMovesForPlayer.get(0)+"\"</h4>\n");
+            return;
+        }
+
         sb.append("<h3>First move choice for player "+(roleIndex + 1)+"</h3>\n");
         ImmutableList<String> unparsedParameterValues = unparsedParameterValuesByGame().get(game);
 
-        // Rows are possible moves, columns are parameter settings, cells are probabilities
-        List<String> allFirstMovesForPlayer = getAllFirstMovesForPlayer(roleIndex, results);
         Map<String, Multiset<String>> countsByMoveByParamValue = getCountsByMoveByParamValue(roleIndex, results, game);
 
+        // Rows are possible moves, columns are parameter settings, cells are probabilities
         sb.append("<table>\n");
 
         // TODO: Write the first row, where we list our parameter settings
