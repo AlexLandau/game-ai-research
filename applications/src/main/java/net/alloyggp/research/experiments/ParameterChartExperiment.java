@@ -246,7 +246,9 @@ public abstract class ParameterChartExperiment<T> implements Experiment {
         }
         sb.append("</table>\n");
 
-        writeOutcomesDataTable(sb, possibleOutcomes, numbersDivId, overallCountsByOutcome);
+        writeOutcomesDataTable(sb, possibleOutcomes, numbersDivId);
+
+        sb.append("<script>setData('"+numbersDivId+"', "+overallCountsByOutcome+")</script>\n");
 
         if (errorCount > 0) {
             sb.append("<p>(In addition, " + errorCount + " matches were run which encountered errors.)</p>\n");
@@ -268,7 +270,7 @@ public abstract class ParameterChartExperiment<T> implements Experiment {
         return counts;
     }
 
-    private void writeOutcomesDataTable(StringBuilder sb, Collection<ImmutableList<Double>> possibleOutcomes, String numbersDivId, List<Integer> initialValues) {
+    private void writeOutcomesDataTable(StringBuilder sb, Collection<ImmutableList<Double>> possibleOutcomes, String numbersDivId) {
         sb.append("<table class='raw-outcomes-data'>\n");
         sb.append(" <caption>Outcome counts</caption>\n");
         sb.append(" <tr>\n");
@@ -282,9 +284,7 @@ public abstract class ParameterChartExperiment<T> implements Experiment {
         sb.append(" <tr>\n");
         for (int i = 0; i < possibleOutcomes.size(); i++) {
             String specificId = numbersDivId + "-" + i;
-            sb.append("  <td id=\"" + specificId + "\">");
-            sb.append(initialValues.get(i));
-            sb.append("</td>\n");
+            sb.append("  <td id=\"" + specificId + "\"></td>\n");
         }
         sb.append(" </tr>\n");
         sb.append("</table>\n");
