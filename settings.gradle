@@ -1,3 +1,5 @@
+include 'all-games'
+include 'all-strategies'
 include 'applications'
 include 'games-ggp'
 include 'strategies-java'

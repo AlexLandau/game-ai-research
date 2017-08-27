@@ -8,10 +8,8 @@ repositories {
 dependencies {
     compile project(':shared')
 
-    compile project(':games-ggp')
-
-    compile project(':strategies-java')
-    compile project(':strategies-kotlin')
+    compile project(':all-games')
+    compile project(':all-strategies')
 
     compileOnly 'org.immutables:value:2.5.5'
 
