@@ -119,7 +119,7 @@ public abstract class ParameterChartExperiment<T> implements Experiment {
             sb.append("<h1>" + Game.valueOf(gameId).getDisplayName() + "</h1>\n");
             writeSampleSizeAndTimingNote(sb, groupedResultsByGameId.get(gameId), game);
             writeTableForResults(sb, groupedResultsByGameId.get(gameId), game);
-            writeTablesForMoveChoices(sb, groupedResultsByGameId.get(gameId), game);
+            writeSectionForMoveChoices(sb, groupedResultsByGameId.get(gameId), game);
         }
 
         sb.append("</body></html>\n");
@@ -133,10 +133,16 @@ public abstract class ParameterChartExperiment<T> implements Experiment {
         sb.append("    const cellId = componentId + \"-\" + i;\n");
         sb.append("    document.getElementById(cellId).innerHTML = \"\" + countsArray[i];\n");
         sb.append("  }\n");
-        sb.append("  document.getElementById(componentId).innerHTML = text;\n");
         sb.append("}\n");
-        sb.append("function unsetData(componentId) {\n");
-        sb.append("  document.getElementById(componentId).innerHTML = '';\n");
+        sb.append("function showFirstMoves(moveTablesDivId) {\n");
+        sb.append("  document.getElementById(moveTablesDivId).style.display = '';\n");
+        sb.append("  document.getElementById(moveTablesDivId + '-show').style.display = 'none';\n");
+        sb.append("  document.getElementById(moveTablesDivId + '-hide').style.display = '';\n");
+        sb.append("}\n");
+        sb.append("function hideFirstMoves(moveTablesDivId) {\n");
+        sb.append("  document.getElementById(moveTablesDivId).style.display = 'none';\n");
+        sb.append("  document.getElementById(moveTablesDivId + '-show').style.display = '';\n");
+        sb.append("  document.getElementById(moveTablesDivId + '-hide').style.display = 'none';\n");
         sb.append("}\n");
         sb.append("</script>\n");
     }
@@ -499,10 +505,18 @@ public abstract class ParameterChartExperiment<T> implements Experiment {
         return results;
     }
 
-    private void writeTablesForMoveChoices(StringBuilder sb,
+    private void writeSectionForMoveChoices(StringBuilder sb,
             ListMultimap<List<String>, MatchResult> results, Game game) {
+        String moveTablesDivId = "firstMoveInfo-" + game.toString();
+        sb.append("<p>First move info ");
+        sb.append("<span id='"+moveTablesDivId+"-show'><a href=\"javascript:showFirstMoves('"+moveTablesDivId+"')\">Show</a></span>");
+        sb.append("<span id='"+moveTablesDivId+"-hide'><a href=\"javascript:hideFirstMoves('"+moveTablesDivId+"')\">Hide</a></span>");
+        sb.append("</p>\n");
+        sb.append("<div id='"+moveTablesDivId+"'>\n");
         writeMoveChoiceTableForPlayer(0, sb, results, game);
         writeMoveChoiceTableForPlayer(1, sb, results, game);
+        sb.append("</div>\n");
+        sb.append("<script>hideFirstMoves('"+moveTablesDivId+"');</script>\n");
     }
 
     private void writeMoveChoiceTableForPlayer(int roleIndex, StringBuilder sb,
