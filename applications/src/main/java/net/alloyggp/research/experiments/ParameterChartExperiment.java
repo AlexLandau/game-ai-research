@@ -2,12 +2,14 @@ package net.alloyggp.research.experiments;
 
 import java.awt.Color;
 import java.text.NumberFormat;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.SortedSet;
+import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
@@ -102,7 +104,12 @@ public abstract class ParameterChartExperiment<T> implements Experiment {
 
     private String writeHtml(Map<String, ListMultimap<List<String>, MatchResult>> groupedResultsByGameId) {
         StringBuilder sb = new StringBuilder();
-        sb.append("<html><head><title>UCT Charts</title><style>.outcomes-table td {width:36px;height:36px;text-align:center;}</style></head><body>\n");
+        sb.append("<!DOCTYPE html><html><head><meta charset=\"UTF-8\"/><title>UCT Charts</title>"
+                + "<style>.outcomes-table td {width:36px;height:36px;text-align:center;}"
+                + ".raw-outcomes-data td,th {border: 2px solid black;}"
+                + ".raw-outcomes-data {border-collapse: collapse; border: 2px solid black;}</style>\n");
+        writeScripts(sb);
+        sb.append("</head><body>\n");
 
         sb.append("<p>Player 1 is blue, player 2 is red.</p>\n");
         sb.append("<p>Hover over a cell to see player 1's average score on a scale from 0 to 1, followed by the average seconds taken per match.</p>\n");
@@ -117,6 +124,21 @@ public abstract class ParameterChartExperiment<T> implements Experiment {
 
         sb.append("</body></html>\n");
         return sb.toString();
+    }
+
+    private void writeScripts(StringBuilder sb) {
+        sb.append("<script>\n");
+        sb.append("function setData(componentId, countsArray) {\n");
+        sb.append("  for (let i = 0; i < countsArray.length; i++) {\n");
+        sb.append("    const cellId = componentId + \"-\" + i;\n");
+        sb.append("    document.getElementById(cellId).innerHTML = \"\" + countsArray[i];\n");
+        sb.append("  }\n");
+        sb.append("  document.getElementById(componentId).innerHTML = text;\n");
+        sb.append("}\n");
+        sb.append("function unsetData(componentId) {\n");
+        sb.append("  document.getElementById(componentId).innerHTML = '';\n");
+        sb.append("}\n");
+        sb.append("</script>\n");
     }
 
     private void writeSampleSizeAndTimingNote(StringBuilder sb, ListMultimap<List<String>, MatchResult> listMultimap, Game game) {
@@ -165,7 +187,11 @@ public abstract class ParameterChartExperiment<T> implements Experiment {
     //TODO: Adjust the cell sizes and label font sizes so the cells are perfect squares, and/or convert to <svg>
     private void writeTableForResults(StringBuilder sb, ListMultimap<List<String>, MatchResult> resultsByBox, Game game) {
         List<String> unparsedParameterValues = unparsedParameterValuesByGame().get(game);
-        sb.append("<table class='outcomes-table' style='border-collapse: collapse'>\n");
+        List<ImmutableList<Double>> possibleOutcomes = getPossibleOutcomes(resultsByBox.values());
+        List<Integer> overallCountsByOutcome = getCountsByOutcome(resultsByBox.values(), possibleOutcomes);
+        String numbersDivId = "numbers-" + game.getId();
+        // HACK: See note below on our setData inputs
+        sb.append("<table class='outcomes-table' style='border-collapse: collapse' onMouseLeave=\"setData('"+numbersDivId+"', "+overallCountsByOutcome+")\">\n");
 
         // Remember to also change the description at the top of the report
         // if you change the color scheme.
@@ -184,6 +210,7 @@ public abstract class ParameterChartExperiment<T> implements Experiment {
         }
         sb.append(" </tr>\n");
 
+
         NumberFormat numberFormat = getThreeDigitDecimalFormat();
         int errorCount = 0;
         for (int row = 0; row < unparsedParameterValues.size(); row++) {
@@ -194,6 +221,7 @@ public abstract class ParameterChartExperiment<T> implements Experiment {
             for (int col = 0; col < unparsedParameterValues.size(); col++) {
                 List<MatchResult> resultsInBox = Lists.newLinkedList(resultsByBox.get(ImmutableList.of(unparsedParameterValues.get(row), unparsedParameterValues.get(col))));
                 errorCount += removeErrors(resultsInBox);
+                List<Integer> countsByOutcome = getCountsByOutcome(resultsInBox, possibleOutcomes);
                 double player1AvgVal = averageFirstPlayerScore(resultsInBox);
                 boolean isEmpty = resultsInBox.isEmpty();
                 @Nullable Double avgTimeTaken = averageSecondsTaken(resultsInBox);
@@ -203,16 +231,101 @@ public abstract class ParameterChartExperiment<T> implements Experiment {
                 String hoverText = player1AvgText + timeTakenText;
 
                 Color color = isEmpty ? colorer.getEmptyColor() : colorer.getColor(player1AvgVal);
-                sb.append("  <td style='background-color:"+getCssRgbString(color)+"' title='"+hoverText+"'/>\n");
+                sb.append("  <td style='background-color:"+getCssRgbString(color)+"' title='"+hoverText+"' "
+                        // HACK: The countsByOutcome toString() very conveniently gives the JavaScript syntax
+                        // for an array of numbers
+                        + "onMouseEnter=\"setData('"+numbersDivId+"', "+countsByOutcome+")\"/>\n");
             }
             sb.append(" </tr>\n");
         }
         sb.append("</table>\n");
+
+        writeOutcomesDataTable(sb, possibleOutcomes, numbersDivId, overallCountsByOutcome);
+
         if (errorCount > 0) {
             sb.append("<p>(In addition, " + errorCount + " matches were run which encountered errors.)</p>\n");
         }
     }
 
+    private List<Integer> getCountsByOutcome(Iterable<MatchResult> results,
+            List<ImmutableList<Double>> possibleOutcomes) {
+        List<Integer> counts = Lists.newArrayList();
+        for (int i = 0; i < possibleOutcomes.size(); i++) {
+            counts.add(0);
+        }
+        for (MatchResult result : results) {
+            if (result.getOutcomes().isPresent()) {
+                int index = possibleOutcomes.indexOf(result.getOutcomes().get());
+                counts.set(index, 1 + counts.get(index));
+            }
+        }
+        return counts;
+    }
+
+    private void writeOutcomesDataTable(StringBuilder sb, Collection<ImmutableList<Double>> possibleOutcomes, String numbersDivId, List<Integer> initialValues) {
+        sb.append("<table class='raw-outcomes-data'>\n");
+        sb.append(" <caption>Outcome counts</caption>\n");
+        sb.append(" <tr>\n");
+        for (ImmutableList<Double> outcome : possibleOutcomes) {
+            sb.append("  <th>");
+            sb.append(styleOutcome(outcome));
+            sb.append("</th>\n");
+        }
+        sb.append(" </tr>\n");
+
+        sb.append(" <tr>\n");
+        for (int i = 0; i < possibleOutcomes.size(); i++) {
+            String specificId = numbersDivId + "-" + i;
+            sb.append("  <td id=\"" + specificId + "\">");
+            sb.append(initialValues.get(i));
+            sb.append("</td>\n");
+        }
+        sb.append(" </tr>\n");
+        sb.append("</table>\n");
+    }
+
+    private String styleOutcome(ImmutableList<Double> outcome) {
+        return outcome.stream()
+                .map(d -> {
+                    if (d == 0.0) {
+                        return "0";
+                    } else if (d == 1.0) {
+                        return "1";
+                    } else {
+                        return d.toString();
+                    }
+                })
+                .collect(Collectors.joining("-"));
+    }
+
+    /**
+     * Returns the outcomes sorted in a particular, consistent order.
+     */
+    private List<ImmutableList<Double>> getPossibleOutcomes(Collection<MatchResult> results) {
+        Set<ImmutableList<Double>> outcomes = Sets.newHashSet();
+        for (MatchResult result : results) {
+            if (result.getOutcomes().isPresent()) {
+                outcomes.add(result.getOutcomes().get());
+            }
+        }
+        return ImmutableList.copyOf(sortOutcomes(outcomes));
+    }
+
+    private Collection<ImmutableList<Double>> sortOutcomes(Set<ImmutableList<Double>> elementSet) {
+        return ImmutableSortedSet.copyOf((outcome1, outcome2) -> {
+            if (outcome1.size() != outcome2.size()) {
+                throw new IllegalArgumentException();
+            }
+            for (int i = 0; i < outcome1.size(); i++) {
+                // Put first player winning first
+                int comparison = -Double.compare(outcome1.get(i), outcome2.get(i));
+                if (comparison != 0) {
+                    return comparison;
+                }
+            }
+            return 0;
+        }, elementSet);
+    }
     /**
      * Returns the number of matches removed from the list because they resulted in errors.
      */
