@@ -19,8 +19,8 @@ import net.alloyggp.research.Experiment;
 import net.alloyggp.research.ImmutableMatchSpec;
 import net.alloyggp.research.MatchResult;
 import net.alloyggp.research.MatchSpec;
-import net.alloyggp.research.applications.Game;
 import net.alloyggp.research.applications.MatchResults;
+import net.alloyggp.research.game.Game;
 
 // TODO: Add information about error counts
 public class ABTestExperiment implements Experiment {

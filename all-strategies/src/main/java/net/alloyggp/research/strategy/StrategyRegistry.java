@@ -1,4 +1,4 @@
-package net.alloyggp.research.applications;
+package net.alloyggp.research.strategy;
 
 import java.util.List;
 import java.util.Map;
@@ -9,11 +9,6 @@ import com.google.common.collect.Maps;
 
 import net.alloyggp.research.Strategy;
 import net.alloyggp.research.StrategyProvider;
-import net.alloyggp.research.strategy.MemorylessUCTOneNodeExpansionStrategyProvider;
-import net.alloyggp.research.strategy.MemorylessUCTRecordAllNodesStrategyProvider;
-import net.alloyggp.research.strategy.MemorylessUCTWinsFirstStrategyProvider;
-import net.alloyggp.research.strategy.NPlyLookaheadStrategyProvider;
-import net.alloyggp.research.strategy.RandomStrategyProvider;
 import net.alloyggp.research.strategy.parameter.StrategyParameterDescription;
 import net.alloyggp.research.strategy.parameter.StrategyParameters;
 

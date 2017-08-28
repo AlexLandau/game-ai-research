@@ -6,12 +6,12 @@ import net.alloyggp.research.ImmutableMatchSpec;
 import net.alloyggp.research.MatchResult;
 import net.alloyggp.research.MatchSpec;
 import net.alloyggp.research.StrategyProvider;
-import net.alloyggp.research.applications.Game;
 import net.alloyggp.research.applications.MatchResults;
 import net.alloyggp.research.applications.MatchRunner;
-import net.alloyggp.research.applications.StrategyRegistry;
+import net.alloyggp.research.game.Game;
 import net.alloyggp.research.strategy.MemorylessUCTRecordAllNodesStrategyProvider;
 import net.alloyggp.research.strategy.RandomStrategyProvider;
+import net.alloyggp.research.strategy.StrategyRegistry;
 import net.alloyggp.research.strategy.parameter.StrategyParameters;
 
 // This is a simple test of the framework.

@@ -34,8 +34,8 @@ import net.alloyggp.research.ImmutableMatchSpec;
 import net.alloyggp.research.MatchResult;
 import net.alloyggp.research.MatchSpec;
 import net.alloyggp.research.StrategyProvider;
-import net.alloyggp.research.applications.Game;
-import net.alloyggp.research.applications.StrategyRegistry;
+import net.alloyggp.research.game.Game;
+import net.alloyggp.research.strategy.StrategyRegistry;
 import net.alloyggp.research.strategy.parameter.StrategyParameterDescription;
 import net.alloyggp.research.strategy.parameter.StrategyParameters;
 

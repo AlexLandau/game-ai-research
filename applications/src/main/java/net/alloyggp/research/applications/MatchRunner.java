@@ -19,6 +19,8 @@ import net.alloyggp.research.MatchSpec;
 import net.alloyggp.research.Move;
 import net.alloyggp.research.Player;
 import net.alloyggp.research.Strategy;
+import net.alloyggp.research.game.Game;
+import net.alloyggp.research.strategy.StrategyRegistry;
 
 public class MatchRunner {
     private final MatchSpec matchSpec;

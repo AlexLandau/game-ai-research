@@ -1,8 +1,7 @@
-package net.alloyggp.research.applications;
+package net.alloyggp.research.game;
 
 import net.alloyggp.research.GameState;
 import net.alloyggp.research.GameTreeProvider;
-import net.alloyggp.research.game.GGPBaseGame;
 
 /*
  * TODO: Other things that we might consider as properties:
