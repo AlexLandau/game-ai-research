@@ -41,7 +41,7 @@ import net.alloyggp.research.strategy.parameter.StrategyParameters;
 
 //TODO: Add information about error counts
 @Value.Immutable
-public abstract class ParameterChartExperiment<T> implements Experiment {
+public abstract class ParameterChartExperiment implements Experiment {
     protected abstract String experimentName();
     protected abstract StrategyProvider strategyProvider();
     protected abstract StrategyParameters initialParameters();
