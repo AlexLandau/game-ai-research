@@ -83,7 +83,7 @@ public class ExperimentRegistry {
 
                 // Sample A/B test experiment
                 new ABTestExperiment(
-                        "TestTicTacToeABExperiment",
+                        "TestUCTWinsFirstABExperiment",
                         ImmutableList.of(
                                 "UCTRecordAllNodes:iterationCount=20",
                                 "UCTRecordAllNodes:iterationCount=200",
