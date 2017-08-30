@@ -63,10 +63,10 @@ public class ExperimentRegistry {
 
                 // Sample A/B test experiment
                 new ABTestExperiment(
-                        "TestABExperiment",
+                        "TestTicTacToeABExperiment",
                         ImmutableList.of(
-                                "UCT:iterationCount=20",
-                                "UCT:iterationCount=200",
+                                "UCTRecordAllNodes:iterationCount=20",
+                                "UCTRecordAllNodes:iterationCount=200",
                                 "UCTOneNodeExpansion:iterationCount=20",
                                 "UCTOneNodeExpansion:iterationCount=200",
                                 "UCTOneNodeExpansion:iterationCount=2000",
@@ -77,6 +77,23 @@ public class ExperimentRegistry {
                                 "NPlyLookahead:defaultOutcome=0.5:pliesToLookAhead=1",
                                 "NPlyLookahead:defaultOutcome=0.5:pliesToLookAhead=5",
                                 "NPlyLookahead:defaultOutcome=0.5:pliesToLookAhead=6"
+                                ),
+                        ImmutableList.of(Game.TIC_TAC_TOE),
+                        100),
+
+                // Sample A/B test experiment
+                new ABTestExperiment(
+                        "TestTicTacToeABExperiment",
+                        ImmutableList.of(
+                                "UCTRecordAllNodes:iterationCount=20",
+                                "UCTRecordAllNodes:iterationCount=200",
+                                "UCTOneNodeExpansion:iterationCount=20",
+                                "UCTOneNodeExpansion:iterationCount=200",
+                                "UCTOneNodeExpansion:iterationCount=2000",
+                                "UCTWinsFirst:iterationCount=20",
+                                "UCTWinsFirst:iterationCount=200",
+                                "UCTWinsFirst:iterationCount=2000",
+                                "Random"
                                 ),
                         ImmutableList.of(Game.TIC_TAC_TOE,
                                 Game.BREAKTHROUGH,

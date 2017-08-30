@@ -36,7 +36,7 @@ class MemorylessUCTRecordAllNodesStrategyProvider: StrategyProvider {
     }
 
     override fun getName(): String {
-        return "UCT"
+        return "UCTRecordAllNodes"
     }
 
     override fun getParameters(): List<StrategyParameterDescription<*>> {
