@@ -102,7 +102,7 @@ public class ExperimentRegistry {
                                 Game.CONNECT_FOUR_8x6,
                                 Game.CONNECT_FOUR_9x6,
                                 Game.PENTAGO),
-                        100)
+                        500)
 
         );
     }
