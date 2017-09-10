@@ -30,9 +30,9 @@ public class ExperimentRegistry {
                         .putUnparsedParameterValuesByGame(Game.DOTS_AND_BOXES,        "10", "20", "40", "80", "160", "320", "640", "1280", "2560", "5120")
                         .putUnparsedParameterValuesByGame(Game.DOTS_AND_BOXES_MISERE, "10", "20", "40", "80", "160", "320", "640", "1280", "2560", "5120")
                         .putUnparsedParameterValuesByGame(Game.ENGLISH_DRAUGHTS,      "10", "20", "40", "80", "160", "320", "640", "1280", "2560")
-                        .putUnparsedParameterValuesByGame(Game.GOMOKU_11x11,          "10", "20", "40", "80", "160", "320", "640", "1280")
+                        .putUnparsedParameterValuesByGame(Game.GOMOKU_11x11,          "10", "20", "40", "80", "160", "320", "640", "1280", "2560")
                         .putUnparsedParameterValuesByGame(Game.GOMOKU_15x15,          "10", "20", "40", "80", "160", "320", "640", "1280")
-                        .putUnparsedParameterValuesByGame(Game.GOMOKU_SWAP2_11x11,    "10", "20", "40", "80", "160", "320", "640", "1280")
+                        .putUnparsedParameterValuesByGame(Game.GOMOKU_SWAP2_11x11,    "10", "20", "40", "80", "160", "320", "640", "1280", "2560")
                         .putUnparsedParameterValuesByGame(Game.GOMOKU_SWAP2_15x15,    "10", "20", "40", "80", "160", "320", "640", "1280")
                         .putUnparsedParameterValuesByGame(Game.BREAKTHROUGH,          "10", "20", "40", "80", "160", "320", "640", "1280", "2560")
                         .putUnparsedParameterValuesByGame(Game.BREAKTHROUGH_6x6,      "10", "20", "40", "80", "160", "320", "640", "1280", "2560", "5120", "10240")
@@ -45,7 +45,7 @@ public class ExperimentRegistry {
                         .putUnparsedParameterValuesByGame(Game.QUARTO_MISERE,         "10", "20", "40", "80", "160", "320", "640", "1280", "2560", "5120", "10240")
                         .putUnparsedParameterValuesByGame(Game.REVERSI,               "10", "20", "40", "80", "160", "320", "640", "1280", "2560")
                         .putUnparsedParameterValuesByGame(Game.REVERSI_MISERE,        "10", "20", "40", "80", "160", "320", "640", "1280")
-                        .putUnparsedParameterValuesByGame(Game.SHEEP_AND_WOLF,        "10", "20", "40", "80", "160", "320", "640", "1280", "2560", "5120", "10240", "20480")
+                        .putUnparsedParameterValuesByGame(Game.SHEEP_AND_WOLF,        "10", "20", "40", "80", "160", "320", "640", "1280", "2560", "5120", "10240", "20480", "40960")
                         // TODO: Understand what sample size we want here, in terms of effects on visual "accuracy"
                         .iterationsPerConfiguration(100)
                         .build(),
