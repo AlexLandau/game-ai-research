@@ -2,6 +2,7 @@ package net.alloyggp.research.game;
 
 import net.alloyggp.research.GameState;
 import net.alloyggp.research.GameTreeProvider;
+import net.alloyggp.research.game.impl.SheepAndWolf;
 
 /*
  * TODO: Other things that we might consider as properties:
@@ -37,7 +38,7 @@ public enum Game {
     QUARTO_MISERE("Quarto Misère", GGPBaseGame.usingSanchoEngine("quartoSuicide"), Simultaneous.NO),
     REVERSI("Reversi", GGPBaseGame.usingSanchoEngine("reversi"), Simultaneous.NO),
     REVERSI_MISERE("Reversi Misère", GGPBaseGame.usingSanchoEngine("reversiSuicide"), Simultaneous.NO),
-    SHEEP_AND_WOLF("Sheep and Wolf", GGPBaseGame.usingSanchoEngine("sheepAndWolf"), Simultaneous.NO),
+    SHEEP_AND_WOLF("Sheep and Wolf", new SheepAndWolf(), Simultaneous.NO),
     TIC_TAC_TOE("Tic-tac-toe", GGPBaseGame.usingSanchoEngine("ticTacToe"), Simultaneous.NO),
     ;
     private final String displayName;

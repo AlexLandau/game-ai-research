@@ -7,4 +7,8 @@ repositories {
 
 dependencies {
     compile project(':games-ggp')
+    compile project(':games-java')
+
+    testCompile 'junit:junit:4.11'
+    testCompile 'org.apache.commons:commons-math3:3.6.1'
 }
