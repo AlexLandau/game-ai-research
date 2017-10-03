@@ -73,6 +73,8 @@ public class ExperimentRegistry {
                                 "UCTWinsFirst:iterationCount=20",
                                 "UCTWinsFirst:iterationCount=200",
                                 "UCTWinsFirst:iterationCount=2000",
+                                "UCTWinsFirst:iterationCount=2000:c_p=2.828427",
+                                "UCTWinsFirst:iterationCount=2000:c_p=0.707107",
                                 "Random",
                                 "NPlyLookahead:defaultOutcome=0.5:pliesToLookAhead=1",
                                 "NPlyLookahead:defaultOutcome=0.5:pliesToLookAhead=5",
