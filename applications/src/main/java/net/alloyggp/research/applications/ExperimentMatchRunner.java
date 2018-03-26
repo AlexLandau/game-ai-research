@@ -89,6 +89,9 @@ public class ExperimentMatchRunner {
                 .map(result -> result.getSpec())
                 .collect(ImmutableMultiset.toImmutableMultiset());
 
+        System.out.println("Starting to enqueue matches for experiment " + experiment + ".");
+        System.out.println("Number of matches already done for this experiment: " + existingSpecCounts.size());
+
         // We note that partial results are often more interesting to look at when
         // iterations are spread evenly across different possibilities, as opposed to
         // collecting all at once.
