@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
+import org.apache.commons.math3.stat.inference.AlternativeHypothesis;
+import org.apache.commons.math3.stat.inference.BinomialTest;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMultiset;
@@ -92,6 +94,12 @@ public class ABTestExperiment implements Experiment {
             sb.append("<h2>Game: " + game.getDisplayName() + "</h2>\n");
             writeLeaderboardAndComparisonTables(sb, resultsForGame);
         }
+
+        sb.append("<p>Notes about p-values: The p-values listed are for a two-sided binomial test treating "
+                + "matches as win or loss events based on aggregate scores, ignoring the nuance of possible "
+                + "values between 0 and 1. Note that stopping an experiment early based on preliminary results "
+                + "or extending it beyond the initial number of tests may invalidate the resulting p-values for "
+                + "the purposes of testing statistical significance.</p>\n");
     }
 
     private void writeLeaderboardAndComparisonTables(StringBuilder sb,
@@ -168,7 +176,13 @@ public class ABTestExperiment implements Experiment {
                 } else {
                     SummaryStatistics stats = matchupStats.get(ImmutableList.of(rowStrat, colStrat));
                     double mean = stats.getMean();
-                    sb.append("  <td>" + numberFormat.format(mean) + "</td>\n");
+                    /*
+                     * As also explained in the output HTML: The p-values listed are for a two-sided binomial
+                     * test treating matches as win or loss events based on aggregate scores, ignoring the nuance
+                     * of possible values between 0 and 1.
+                     */
+                    double pValue = new BinomialTest().binomialTest((int) stats.getN(), (int) stats.getSum(), 0.5, AlternativeHypothesis.TWO_SIDED);
+                    sb.append("  <td>" + numberFormat.format(mean) + " (p: " + numberFormat.format(pValue) + ")</td>\n");
                 }
             }
             sb.append(" </tr>\n");
