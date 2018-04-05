@@ -207,11 +207,11 @@ public abstract class ParameterChartExperiment implements Experiment {
         {
             //Upper-left corner
             Color color = colorer.getColor(0.5);
-            sb.append(" <tr><td style='background-color:"+getCssRgbString(color)+"'/>\n");
+            sb.append(" <tr><td style='background-color:"+Reports.getCssRgbString(color)+"'/>\n");
         }
         for (int col = 0; col < unparsedParameterValues.size(); col++) {
-            String bgColor = getCssRgbString(colorer.getColor(0.0));
-            String fontColor = getCssRgbString(colorer.getP2TextColor());
+            String bgColor = Reports.getCssRgbString(colorer.getColor(0.0));
+            String fontColor = Reports.getCssRgbString(colorer.getP2TextColor());
             sb.append("  <td style='background-color:"+bgColor+"; color:"+fontColor+"'>"+unparsedParameterValues.get(col)+"</td>\n");
         }
         sb.append(" </tr>\n");
@@ -221,8 +221,8 @@ public abstract class ParameterChartExperiment implements Experiment {
         int errorCount = 0;
         for (int row = 0; row < unparsedParameterValues.size(); row++) {
             sb.append(" <tr>\n");
-            String bgColor = getCssRgbString(colorer.getColor(1.0));
-            String fontColor = getCssRgbString(colorer.getP1TextColor());
+            String bgColor = Reports.getCssRgbString(colorer.getColor(1.0));
+            String fontColor = Reports.getCssRgbString(colorer.getP1TextColor());
             sb.append("  <td style='background-color:"+bgColor+"; color:"+fontColor+"'>"+unparsedParameterValues.get(row)+"</td>\n");
             for (int col = 0; col < unparsedParameterValues.size(); col++) {
                 List<MatchResult> resultsInBox = Lists.newLinkedList(resultsByBox.get(ImmutableList.of(unparsedParameterValues.get(row), unparsedParameterValues.get(col))));
@@ -237,7 +237,7 @@ public abstract class ParameterChartExperiment implements Experiment {
                 String hoverText = player1AvgText + timeTakenText;
 
                 Color color = isEmpty ? colorer.getEmptyColor() : colorer.getColor(player1AvgVal);
-                sb.append("  <td style='background-color:"+getCssRgbString(color)+"' title='"+hoverText+"' "
+                sb.append("  <td style='background-color:"+Reports.getCssRgbString(color)+"' title='"+hoverText+"' "
                         // HACK: The countsByOutcome toString() very conveniently gives the JavaScript syntax
                         // for an array of numbers
                         + "onMouseEnter=\"setData('"+numbersDivId+"', "+countsByOutcome+")\"/>\n");
@@ -346,9 +346,6 @@ public abstract class ParameterChartExperiment implements Experiment {
             }
         }
         return count;
-    }
-    private static String getCssRgbString(Color color) {
-        return "rgb("+color.getRed()+","+color.getGreen()+","+color.getBlue()+")";
     }
 
     private static interface Colorer {

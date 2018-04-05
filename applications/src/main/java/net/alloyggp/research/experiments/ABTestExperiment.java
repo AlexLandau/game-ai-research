@@ -1,8 +1,10 @@
 package net.alloyggp.research.experiments;
 
+import java.awt.Color;
 import java.text.NumberFormat;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -72,7 +74,8 @@ public class ABTestExperiment implements Experiment {
     public String writeHtmlOutput(List<MatchResult> results) {
         StringBuilder sb = new StringBuilder();
 
-        sb.append("<html><head><title>").append(experimentName).append("</title></head>\n");
+        sb.append("<html><head><title>").append(experimentName).append("</title>");
+        sb.append("<style>.sig { color: black; } .nonsig { color: gray; }</style></head>\n");
         sb.append("<body>");
 
         writeBodyContents(sb, results);
@@ -146,7 +149,10 @@ public class ABTestExperiment implements Experiment {
         sortedStrategies.removeIf(strategy -> strategyStats.get(strategy).getN() == 0);
         sortedStrategies.sort(Comparator.comparing(strategy -> strategyStats.get(strategy).getMean()).reversed());
 
+        Map<String, String> strategyShorthands = getStrategyShorthands(sortedStrategies);
+
         NumberFormat numberFormat = getThreeDigitDecimalFormat();
+        Colorer colorer = new MutedRedWhiteBlueColorer();
 
         // Write the leaderboard table
         sb.append("<table>\n");
@@ -163,12 +169,12 @@ public class ABTestExperiment implements Experiment {
         sb.append("<table>\n");
         sb.append(" <tr><td></td>\n");
         for (String colStrat : sortedStrategies) {
-            sb.append("  <td>" + colStrat + "</td>\n");
+            sb.append("  <td>" + strategyShorthands.get(colStrat) + "</td>\n");
         }
         sb.append(" </tr>\n");
         for (String rowStrat : sortedStrategies) {
             sb.append(" <tr>\n");
-            sb.append("  <td>" + rowStrat + "</td>\n");
+            sb.append("  <td>" + strategyShorthands.get(rowStrat) + " " + rowStrat + "</td>\n");
             for (String colStrat : sortedStrategies) {
                 if (rowStrat.equals(colStrat)) {
                     sb.append("  <td>N/A</td>\n");
@@ -181,12 +187,26 @@ public class ABTestExperiment implements Experiment {
                      * of possible values between 0 and 1.
                      */
                     double pValue = new org.hipparchus.stat.inference.BinomialTest().binomialTest((int) stats.getN(), (int) stats.getSum(), 0.5, AlternativeHypothesis.TWO_SIDED);
-                    sb.append("  <td>" + numberFormat.format(mean) + " (p: " + numberFormat.format(pValue) + ")</td>\n");
+                    String titleText = "count: " + stats.getN() + "; p: " + pValue;
+                    String tagClass = (pValue < 0.05) ? "sig" : "nonsig";
+                    Color color = colorer.getColor(mean);
+
+                    sb.append("  <td style='background-color:"+Reports.getCssRgbString(color)+"' class=\"" + tagClass + "\" title=\"" + titleText + "\">" + numberFormat.format(mean) + "</td>\n");
                 }
             }
             sb.append(" </tr>\n");
         }
         sb.append("</table>\n");
+    }
+
+    private Map<String, String> getStrategyShorthands(List<String> sortedStrategies) {
+        Map<String, String> results = new HashMap<>();
+        for (int i = 0; i < sortedStrategies.size(); i++) {
+            String strategy = sortedStrategies.get(i);
+            String shorthand = "(" + (i + 1) + ")";
+            results.put(strategy,  shorthand);
+        }
+        return results;
     }
 
     private MinAndMax getMinAndMaxCountsForMatchups(Map<List<String>, DescriptiveStatistics> matchupStats) {
@@ -224,4 +244,46 @@ public class ABTestExperiment implements Experiment {
             this.max = max;
         }
     }
+
+
+    private static interface Colorer {
+        Color getEmptyColor();
+        Color getP1TextColor();
+        Color getP2TextColor();
+        // Scale of 0.0 to 1.0
+        Color getColor(double player1Avg);
+    }
+
+    private static class MutedRedWhiteBlueColorer implements Colorer {
+        @Override
+        public Color getEmptyColor() {
+            return Color.BLACK;
+        }
+
+        @Override
+        public Color getColor(double player1Avg) {
+            if (player1Avg < 0.5) {
+                // 127.5 at 0, 255 at 0.5
+                int val = (int) (player1Avg * 0.6 * 255.0 + 127.5 * 1.4);
+                // light red at 0, white at 0.5
+                return new Color(255, val, val);
+            } else {
+                // 255 at 0.5, 127.5 at 1.0
+                int val = (int) ((1.0 - player1Avg) * 0.6 * 255.0 + 127.5 * 1.4);
+                // white at 0.5, light blue at 1.0
+                return new Color(val, val, 255);
+            }
+        }
+
+        @Override
+        public Color getP1TextColor() {
+            return Color.WHITE;
+        }
+
+        @Override
+        public Color getP2TextColor() {
+            return Color.WHITE;
+        }
+    }
+
 }
