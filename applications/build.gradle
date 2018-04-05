@@ -13,7 +13,7 @@ dependencies {
 
     compileOnly 'org.immutables:value:2.5.5'
 
-    compile 'org.apache.commons:commons-math3:3.6.1'
+    compile 'org.hipparchus:hipparchus-stat:1.2'
 }
 
 // Runs any matches that must be run for experiments not yet done.

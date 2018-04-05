@@ -5,8 +5,8 @@ import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
-import org.apache.commons.math3.random.MersenneTwister;
-import org.apache.commons.math3.random.RandomAdaptor;
+import org.hipparchus.random.MersenneTwister;
+import org.hipparchus.random.RandomAdaptor;
 
 import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableList;

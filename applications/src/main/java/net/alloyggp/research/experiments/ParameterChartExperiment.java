@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
-import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
+import org.hipparchus.stat.descriptive.DescriptiveStatistics;
 import org.immutables.value.Value;
 
 import com.google.common.collect.ArrayListMultimap;
@@ -175,7 +175,7 @@ public abstract class ParameterChartExperiment implements Experiment {
         }
 
         NumberFormat numberFormat = getThreeDigitDecimalFormat();
-        SummaryStatistics summaryStatistics = new SummaryStatistics();
+        DescriptiveStatistics summaryStatistics = new DescriptiveStatistics();
         for (MatchResult result : listMultimap.values()) {
             long millisElapsed = result.getMillisecondsElapsed();
             summaryStatistics.addValue(millisElapsed);

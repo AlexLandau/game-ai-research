@@ -6,9 +6,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
-import org.apache.commons.math3.stat.inference.AlternativeHypothesis;
-import org.apache.commons.math3.stat.inference.BinomialTest;
+import org.hipparchus.stat.descriptive.DescriptiveStatistics;
+import org.hipparchus.stat.inference.AlternativeHypothesis;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMultiset;
@@ -105,13 +104,13 @@ public class ABTestExperiment implements Experiment {
     private void writeLeaderboardAndComparisonTables(StringBuilder sb,
             List<MatchResult> results) {
         // Do computations for these tables
-        Map<String, SummaryStatistics> strategyStats = Maps.newHashMap();
-        Map<List<String>, SummaryStatistics> matchupStats = Maps.newHashMap();
+        Map<String, DescriptiveStatistics> strategyStats = Maps.newHashMap();
+        Map<List<String>, DescriptiveStatistics> matchupStats = Maps.newHashMap();
         for (String strategyId : strategyIds) {
-            strategyStats.put(strategyId, new SummaryStatistics());
+            strategyStats.put(strategyId, new DescriptiveStatistics());
             for (String otherStrategyId : strategyIds) {
                 if (!strategyId.equals(otherStrategyId)) {
-                    matchupStats.put(ImmutableList.of(strategyId, otherStrategyId), new SummaryStatistics());
+                    matchupStats.put(ImmutableList.of(strategyId, otherStrategyId), new DescriptiveStatistics());
                 }
             }
         }
@@ -126,7 +125,7 @@ public class ABTestExperiment implements Experiment {
             }
             for (int playerId : Arrays.asList(0, 1)) {
                 String strategyId = result.getSpec().getStrategyIds().get(playerId);
-                SummaryStatistics stats = strategyStats.get(strategyId);
+                DescriptiveStatistics stats = strategyStats.get(strategyId);
                 stats.addValue(result.getOutcomes().get().get(playerId));
             }
             matchupStats.get(result.getSpec().getStrategyIds())
@@ -174,14 +173,14 @@ public class ABTestExperiment implements Experiment {
                 if (rowStrat.equals(colStrat)) {
                     sb.append("  <td>N/A</td>\n");
                 } else {
-                    SummaryStatistics stats = matchupStats.get(ImmutableList.of(rowStrat, colStrat));
+                    DescriptiveStatistics stats = matchupStats.get(ImmutableList.of(rowStrat, colStrat));
                     double mean = stats.getMean();
                     /*
                      * As also explained in the output HTML: The p-values listed are for a two-sided binomial
                      * test treating matches as win or loss events based on aggregate scores, ignoring the nuance
                      * of possible values between 0 and 1.
                      */
-                    double pValue = new BinomialTest().binomialTest((int) stats.getN(), (int) stats.getSum(), 0.5, AlternativeHypothesis.TWO_SIDED);
+                    double pValue = new org.hipparchus.stat.inference.BinomialTest().binomialTest((int) stats.getN(), (int) stats.getSum(), 0.5, AlternativeHypothesis.TWO_SIDED);
                     sb.append("  <td>" + numberFormat.format(mean) + " (p: " + numberFormat.format(pValue) + ")</td>\n");
                 }
             }
@@ -190,7 +189,7 @@ public class ABTestExperiment implements Experiment {
         sb.append("</table>\n");
     }
 
-    private MinAndMax getMinAndMaxCountsForMatchups(Map<List<String>, SummaryStatistics> matchupStats) {
+    private MinAndMax getMinAndMaxCountsForMatchups(Map<List<String>, DescriptiveStatistics> matchupStats) {
         long minSeen = Integer.MAX_VALUE;
         long maxSeen = 0;
         for (String strategy1 : strategyIds) {
