@@ -23,6 +23,7 @@ import net.alloyggp.research.ImmutableMatchSpec;
 import net.alloyggp.research.MatchResult;
 import net.alloyggp.research.MatchSpec;
 import net.alloyggp.research.applications.MatchResults;
+import net.alloyggp.research.experiments.shared.Colorer;
 import net.alloyggp.research.game.Game;
 
 // TODO: Add information about error counts
@@ -152,7 +153,7 @@ public class ABTestExperiment implements Experiment {
         Map<String, String> strategyShorthands = getStrategyShorthands(sortedStrategies);
 
         NumberFormat numberFormat = getThreeDigitDecimalFormat();
-        Colorer colorer = new MutedRedWhiteBlueColorer();
+        Colorer colorer = Colorer.MUTED_RED_WHITE_BLUE;
 
         // Write the leaderboard table
         sb.append("<table>\n");
@@ -242,47 +243,6 @@ public class ABTestExperiment implements Experiment {
         public MinAndMax(long min, long max) {
             this.min = min;
             this.max = max;
-        }
-    }
-
-
-    private static interface Colorer {
-        Color getEmptyColor();
-        Color getP1TextColor();
-        Color getP2TextColor();
-        // Scale of 0.0 to 1.0
-        Color getColor(double player1Avg);
-    }
-
-    private static class MutedRedWhiteBlueColorer implements Colorer {
-        @Override
-        public Color getEmptyColor() {
-            return Color.BLACK;
-        }
-
-        @Override
-        public Color getColor(double player1Avg) {
-            if (player1Avg < 0.5) {
-                // 127.5 at 0, 255 at 0.5
-                int val = (int) (player1Avg * 0.6 * 255.0 + 127.5 * 1.4);
-                // light red at 0, white at 0.5
-                return new Color(255, val, val);
-            } else {
-                // 255 at 0.5, 127.5 at 1.0
-                int val = (int) ((1.0 - player1Avg) * 0.6 * 255.0 + 127.5 * 1.4);
-                // white at 0.5, light blue at 1.0
-                return new Color(val, val, 255);
-            }
-        }
-
-        @Override
-        public Color getP1TextColor() {
-            return Color.WHITE;
-        }
-
-        @Override
-        public Color getP2TextColor() {
-            return Color.WHITE;
         }
     }
 

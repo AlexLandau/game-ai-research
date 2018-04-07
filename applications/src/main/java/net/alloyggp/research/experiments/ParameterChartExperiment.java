@@ -34,6 +34,7 @@ import net.alloyggp.research.ImmutableMatchSpec;
 import net.alloyggp.research.MatchResult;
 import net.alloyggp.research.MatchSpec;
 import net.alloyggp.research.StrategyProvider;
+import net.alloyggp.research.experiments.shared.Colorer;
 import net.alloyggp.research.game.Game;
 import net.alloyggp.research.strategy.StrategyRegistry;
 import net.alloyggp.research.strategy.parameter.StrategyParameterDescription;
@@ -202,7 +203,7 @@ public abstract class ParameterChartExperiment implements Experiment {
         // Remember to also change the description at the top of the report
         // if you change the color scheme.
 //        Colorer colorer = new GrayscaleColorer();
-        Colorer colorer = new RedWhiteBlueColorer();
+        Colorer colorer = Colorer.RED_WHITE_BLUE_COLORER;
 //        Colorer colorer = new RedGrayBlueColorer();
         {
             //Upper-left corner
@@ -346,101 +347,6 @@ public abstract class ParameterChartExperiment implements Experiment {
             }
         }
         return count;
-    }
-
-    private static interface Colorer {
-        Color getEmptyColor();
-        Color getP1TextColor();
-        Color getP2TextColor();
-        // Scale of 0.0 to 1.0
-        Color getColor(double player1Avg);
-    }
-
-    private static class GrayscaleColorer implements Colorer {
-        @Override
-        public Color getEmptyColor() {
-            return Color.RED;
-        }
-
-        @Override
-        public Color getColor(double player1Avg) {
-            int val = (int) (player1Avg * 255.0);
-            return new Color(val, val, val);
-        }
-
-        @Override
-        public Color getP1TextColor() {
-            return Color.BLACK;
-        }
-
-        @Override
-        public Color getP2TextColor() {
-            return Color.WHITE;
-        }
-    }
-
-    private static class RedWhiteBlueColorer implements Colorer {
-        @Override
-        public Color getEmptyColor() {
-            return Color.BLACK;
-        }
-
-        @Override
-        public Color getColor(double player1Avg) {
-            if (player1Avg < 0.5) {
-                // 0 at 0, 255 at 0.5
-                int val = (int) (player1Avg * 2 * 255.0);
-                // red at 0, white at 0.5
-                return new Color(255, val, val);
-            } else {
-                // 255 at 0.5, 0 at 1.0
-                int val = (int) ((1.0 - player1Avg) * 2 * 255.0);
-                // white at 0.5, blue at 1.0
-                return new Color(val, val, 255);
-            }
-        }
-
-        @Override
-        public Color getP1TextColor() {
-            return Color.WHITE;
-        }
-
-        @Override
-        public Color getP2TextColor() {
-            return Color.WHITE;
-        }
-    }
-
-    private static class RedGrayBlueColorer implements Colorer {
-        @Override
-        public Color getEmptyColor() {
-            return Color.BLACK;
-        }
-
-        @Override
-        public Color getColor(double player1Avg) {
-            if (player1Avg < 0.5) {
-                // 0 at 0, 255/3 at 0.5
-                int val = (int) (player1Avg * 2 * 255.0 / 3.0);
-                // red at 0, white at 0.5
-                return new Color(255 - (2*val), val, val);
-            } else {
-                // 255 at 0.5, 0 at 1.0
-                double val = ((1.0 - player1Avg) * 2 * 255.0 / 3.0);
-                // white at 0.5, blue at 1.0
-                return new Color((int) val, (int) val, (int) (255 - (2*val)));
-            }
-        }
-
-        @Override
-        public Color getP1TextColor() {
-            return Color.WHITE;
-        }
-
-        @Override
-        public Color getP2TextColor() {
-            return Color.WHITE;
-        }
     }
 
     private static NumberFormat getThreeDigitDecimalFormat() {
