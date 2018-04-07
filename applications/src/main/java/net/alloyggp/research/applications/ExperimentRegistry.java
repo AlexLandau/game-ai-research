@@ -95,6 +95,7 @@ public class ExperimentRegistry {
                                 "UCTWinsFirst:iterationCount=2000",
                                 "UCTWinsFirst:iterationCount=2000:c_p=2.828427",
                                 "UCTWinsFirst:iterationCount=2000:c_p=0.707107",
+                                "UCTWinsFirst:iterationCount=2000:c_p=0.353553",
                                 "Random"
                                 ),
                         ImmutableList.of(Game.TIC_TAC_TOE,
@@ -103,7 +104,9 @@ public class ExperimentRegistry {
                                 Game.ENGLISH_DRAUGHTS,
                                 Game.CONNECT_FOUR_8x6,
                                 Game.CONNECT_FOUR_9x6,
-                                Game.PENTAGO),
+                                Game.PENTAGO,
+                                Game.REVERSI,
+                                Game.CEPHALOPOD_3x3),
                         500)
 
         );
