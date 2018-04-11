@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
+import javax.annotation.Nullable;
+
 import org.hipparchus.random.MersenneTwister;
 import org.hipparchus.random.RandomAdaptor;
 
@@ -24,17 +26,30 @@ import net.alloyggp.research.strategy.StrategyRegistry;
 
 public class MatchRunner {
     private final MatchSpec matchSpec;
+    private final @Nullable List<Integer> requestedSeed;
 
-    private MatchRunner(MatchSpec matchSpec) {
+    private MatchRunner(MatchSpec matchSpec, @Nullable List<Integer> requestedSeed) {
         this.matchSpec = matchSpec;
+        this.requestedSeed = requestedSeed;
     }
 
-    public static void run(MatchSpec matchSpec) throws IOException {
-        MatchRunner runner = new MatchRunner(matchSpec);
-        MatchResult result = runner.run();
+    public static void runAndSaveResult(MatchSpec matchSpec) throws IOException {
+        MatchResult result = runWithoutSaving(matchSpec);
 
         MatchResults.saveResult(result);
     }
+
+    public static MatchResult runWithoutSaving(MatchSpec matchSpec) {
+        MatchRunner runner = new MatchRunner(matchSpec, null);
+        return runner.run();
+    }
+
+    // Note: This should only be needed for testing, currently at least
+    /*package-private*/ static MatchResult runFromSeedWithoutSaving(MatchSpec matchSpec, List<Integer> seed) {
+        MatchRunner runner = new MatchRunner(matchSpec, seed);
+        return runner.run();
+    }
+
 
     private MatchResult run() {
         int[] seed = getSeed();
@@ -94,6 +109,9 @@ public class MatchRunner {
     }
 
     private int[] getSeed() {
+        if (requestedSeed != null) {
+            return requestedSeed.stream().mapToInt(i -> i).toArray();
+        }
         return ThreadLocalRandom.current().ints(4).toArray();
     }
 

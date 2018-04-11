@@ -1,5 +1,6 @@
 package net.alloyggp.research.game;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -108,6 +109,7 @@ public final class GGPBaseGame implements GameTreeProvider {
             try {
                 return ruleEngine.getLegalMoves(state, role).stream()
                         .map(nativeMove -> new GGPBaseMove<>(nativeMove, ruleEngine.getTranslator()))
+                        .sorted(Comparator.comparing(move -> move.getName()))
                         .collect(Collectors.toList());
             } catch (GameDescriptionException e) {
                 throw new RuntimeException("Error in GGP-Base game " + gameKey, e);

@@ -14,6 +14,8 @@ dependencies {
     compileOnly 'org.immutables:value:2.5.5'
 
     compile 'org.hipparchus:hipparchus-stat:1.2'
+
+    testCompile 'junit:junit:4.11'
 }
 
 // Runs any matches that must be run for experiments not yet done.

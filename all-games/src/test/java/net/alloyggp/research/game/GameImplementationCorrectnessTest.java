@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.math3.random.MersenneTwister;
 import org.apache.commons.math3.random.RandomAdaptor;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.google.common.collect.Lists;
@@ -18,6 +19,7 @@ import net.alloyggp.research.Move;
 import net.alloyggp.research.game.impl.SheepAndWolf;
 
 public class GameImplementationCorrectnessTest {
+    @Ignore("Intended to be run manually")
     @Test
     public void testSheepAndWolf() {
         testGameDescriptionsEqual(GGPBaseGame.usingSanchoEngine("sheepAndWolf"),

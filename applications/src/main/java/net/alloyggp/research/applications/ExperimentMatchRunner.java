@@ -44,7 +44,7 @@ public class ExperimentMatchRunner {
                     MatchSpec spec = work.matchSpec;
                     System.out.println("Running a match of " + spec.getGameId() + " for experiment " + spec.getExperimentName());
                     try {
-                        MatchRunner.run(spec);
+                        MatchRunner.runAndSaveResult(spec);
                     } catch (IOException e) {
                         // TODO: We should really record errors, which might indicate invalid results
                         e.printStackTrace();
