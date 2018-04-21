@@ -22,6 +22,7 @@ dependencies {
 task runMatches(type: JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
     main = 'net.alloyggp.research.applications.ExperimentMatchRunner'
+    maxHeapSize = '6g'
 }
 
 // Runs any matches that must be run for experiments not yet done.
@@ -30,6 +31,7 @@ task runMatches3(type: JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
     main = 'net.alloyggp.research.applications.ExperimentMatchRunner'
     args '3'
+    maxHeapSize = '6g'
 }
 
 // Generates reports for each experiment based on whatever matches
@@ -37,4 +39,5 @@ task runMatches3(type: JavaExec) {
 task writeReports(type: JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
     main = 'net.alloyggp.research.applications.ReportsWriter'
+    maxHeapSize = '6g'
 }
