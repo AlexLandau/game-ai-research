@@ -85,6 +85,7 @@ public class ExperimentRegistry {
                 new ABTestExperiment(
                         "TestUCT200CpExperiment",
                         ImmutableList.of(
+                                "UCTOneNodeExpansion:iterationCount=200:c_p=0.176777",
                                 "UCTOneNodeExpansion:iterationCount=200:c_p=0.353553",
                                 "UCTOneNodeExpansion:iterationCount=200:c_p=0.707107",
                                 "UCTOneNodeExpansion:iterationCount=200:c_p=1.414214",
@@ -106,6 +107,7 @@ public class ExperimentRegistry {
                 new ABTestExperiment(
                         "TestUCTWinsFirst200CpExperiment",
                         ImmutableList.of(
+                                "UCTWinsFirst:iterationCount=200:c_p=0.176777",
                                 "UCTWinsFirst:iterationCount=200:c_p=0.353553",
                                 "UCTWinsFirst:iterationCount=200:c_p=0.707107",
                                 "UCTWinsFirst:iterationCount=200:c_p=1.414214",
