@@ -105,6 +105,28 @@ public class ExperimentRegistry {
 
                 // Sample A/B test experiment
                 new ABTestExperiment(
+                        "TestUCT2000CpExperiment",
+                        ImmutableList.of(
+                                "UCTOneNodeExpansion:iterationCount=2000:c_p=0.176777",
+                                "UCTOneNodeExpansion:iterationCount=2000:c_p=0.353553",
+                                "UCTOneNodeExpansion:iterationCount=2000:c_p=0.707107",
+                                "UCTOneNodeExpansion:iterationCount=2000:c_p=1.414214",
+                                "UCTOneNodeExpansion:iterationCount=2000:c_p=2.828427"
+                                ),
+                        ImmutableList.of(Game.TIC_TAC_TOE,
+                                Game.BREAKTHROUGH,
+                                Game.DOTS_AND_BOXES,
+                                Game.DOTS_AND_BOXES_MISERE,
+                                Game.ENGLISH_DRAUGHTS,
+                                Game.CONNECT_FOUR_8x6,
+                                Game.CONNECT_FOUR_9x6,
+                                Game.PENTAGO,
+                                Game.REVERSI,
+                                Game.CEPHALOPOD_3x3),
+                        250),
+
+                // Sample A/B test experiment
+                new ABTestExperiment(
                         "TestUCTWinsFirst200CpExperiment",
                         ImmutableList.of(
                                 "UCTWinsFirst:iterationCount=200:c_p=0.176777",
