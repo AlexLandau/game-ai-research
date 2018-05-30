@@ -82,7 +82,7 @@ public class ExperimentRegistry {
                         100),
 
                 new ABTestExperiment(
-                        "IterationCountAffectsCpComparionsA",
+                        "IterationCountAffectsCpComparisonsA",
                         ImmutableList.of(
                                 "UCTOneNodeExpansion:iterationCount=200:c_p=0.176777",
                                 "UCTOneNodeExpansion:iterationCount=200:c_p=0.707107",
@@ -93,7 +93,7 @@ public class ExperimentRegistry {
                         250),
 
                 new ABTestExperiment(
-                        "IterationCountAffectsCpComparionsB",
+                        "IterationCountAffectsCpComparisonsB",
                         ImmutableList.of(
                                 "UCTOneNodeExpansion:iterationCount=200:c_p=0.176777",
                                 "UCTOneNodeExpansion:iterationCount=200:c_p=2.828427",
