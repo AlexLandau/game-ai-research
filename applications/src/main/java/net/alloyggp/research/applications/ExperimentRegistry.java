@@ -81,6 +81,28 @@ public class ExperimentRegistry {
                         ImmutableList.of(Game.TIC_TAC_TOE),
                         100),
 
+                new ABTestExperiment(
+                        "IterationCountAffectsCpComparionsA",
+                        ImmutableList.of(
+                                "UCTOneNodeExpansion:iterationCount=200:c_p=0.176777",
+                                "UCTOneNodeExpansion:iterationCount=200:c_p=0.707107",
+                                "UCTOneNodeExpansion:iterationCount=2000:c_p=0.176777",
+                                "UCTOneNodeExpansion:iterationCount=2000:c_p=0.707107"
+                                ),
+                        ImmutableList.of(Game.BREAKTHROUGH),
+                        250),
+
+                new ABTestExperiment(
+                        "IterationCountAffectsCpComparionsB",
+                        ImmutableList.of(
+                                "UCTOneNodeExpansion:iterationCount=200:c_p=0.176777",
+                                "UCTOneNodeExpansion:iterationCount=200:c_p=2.828427",
+                                "UCTOneNodeExpansion:iterationCount=2000:c_p=0.176777",
+                                "UCTOneNodeExpansion:iterationCount=2000:c_p=2.828427"
+                                ),
+                        ImmutableList.of(Game.CONNECT_FOUR_9x6),
+                        250),
+
                 // Sample A/B test experiment
                 new ABTestExperiment(
                         "TestUCT200CpExperiment",
