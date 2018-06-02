@@ -98,11 +98,41 @@ public class ABTestExperiment implements Experiment {
             writeLeaderboardAndComparisonTables(sb, resultsForGame);
         }
 
+        writeAveragePerGameTimes(sb, resultsByGameId);
+
         sb.append("<p>Notes about p-values: The p-values listed are for a two-sided binomial test treating "
                 + "matches as win or loss events based on aggregate scores, ignoring the nuance of possible "
                 + "values between 0 and 1. Note that stopping an experiment early based on preliminary results "
                 + "or extending it beyond the initial number of tests may invalidate the resulting p-values for "
                 + "the purposes of testing statistical significance.</p>\n");
+    }
+
+    private void writeAveragePerGameTimes(StringBuilder sb,
+            ListMultimap<String, MatchResult> resultsByGameId) {
+        sb.append("<p>Average time to run a match of each game:</p>\n");
+        sb.append("<table>\n");
+        for (Game game : games) {
+            List<MatchResult> list = resultsByGameId.get(game.getId());
+            double averageTime = getAverageTimeSeconds(list);
+            sb.append("<tr><td>" + game.getDisplayName() + "</td><td>" + averageTime + " s</td></tr>\n");
+        }
+        sb.append("</table>\n");
+    }
+
+    private double getAverageTimeSeconds(List<MatchResult> list) {
+        double totalTimeSeconds = 0.0;
+        long matchCount = 0L;
+        for (MatchResult result : list) {
+            if (!result.hadError()) {
+                totalTimeSeconds += (result.getMillisecondsElapsed() / 1000.0);
+                matchCount++;
+            }
+        }
+        if (matchCount == 0L) {
+            return Double.NaN;
+        } else {
+            return totalTimeSeconds / matchCount;
+        }
     }
 
     private void writeLeaderboardAndComparisonTables(StringBuilder sb,
