@@ -109,12 +109,13 @@ public class ABTestExperiment implements Experiment {
 
     private void writeAveragePerGameTimes(StringBuilder sb,
             ListMultimap<String, MatchResult> resultsByGameId) {
+        NumberFormat numberFormat = getThreeDigitDecimalFormat();
         sb.append("<p>Average time to run a match of each game:</p>\n");
         sb.append("<table>\n");
         for (Game game : games) {
             List<MatchResult> list = resultsByGameId.get(game.getId());
             double averageTime = getAverageTimeSeconds(list);
-            sb.append("<tr><td>" + game.getDisplayName() + "</td><td>" + averageTime + " s</td></tr>\n");
+            sb.append("<tr><td>" + game.getDisplayName() + "</td><td>" + numberFormat.format(averageTime) + " s</td></tr>\n");
         }
         sb.append("</table>\n");
     }
