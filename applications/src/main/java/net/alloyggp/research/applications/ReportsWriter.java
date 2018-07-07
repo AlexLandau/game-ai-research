@@ -16,11 +16,15 @@ public class ReportsWriter {
         File reportsDir = Files.getReportsDirectory().getCanonicalFile();
 
         for (Experiment experiment : experiments) {
+            long startTime = System.currentTimeMillis();
             List<MatchResult> results = MatchResults.loadAllResults(experiment.getName());
+            System.out.println("Loaded all results for experiment " + experiment.getName() + " in " + (System.currentTimeMillis() - startTime) + " ms");
+            startTime = System.currentTimeMillis();
             String html = experiment.writeHtmlOutput(results);
 
             File reportFile = new File(reportsDir, getExperimentFilename(experiment.getName()));
             Files.writeStringToFile(reportFile, html);
+            System.out.println("Wrote report for experiment " + experiment.getName() + " in " + (System.currentTimeMillis() - startTime) + " ms");
         }
 
         File indexFile = new File(reportsDir, "index.html");
