@@ -43,6 +43,15 @@ task runMatches5(type: JavaExec) {
     maxHeapSize = '6g'
 }
 
+// Runs any matches that must be run for experiments not yet done.
+// Uses 7 threads.
+task runMatches7(type: JavaExec) {
+    classpath = sourceSets.main.runtimeClasspath
+    main = 'net.alloyggp.research.applications.ExperimentMatchRunner'
+    args '7'
+    maxHeapSize = '6g'
+}
+
 // Generates reports for each experiment based on whatever matches
 // have been run so far.
 task writeReports(type: JavaExec) {
